@@ -11,12 +11,12 @@ namespace Pada.Infrastructure.Web
     {
         protected const string BaseApiPath = "api/v{version:apiVersion}";
         
-        private IMediator _mediator;
+        private IMediator _mediatorInstance;
         
-        protected IMediator Mediator => _mediator ??= HttpContext.RequestServices.GetService<IMediator>();
+        protected IMediator Mediator => _mediatorInstance ??= HttpContext.RequestServices.GetService<IMediator>();
         
-        private IMapper _mapper;
+        private IMapper _mapperInstance;
         
-        protected IMapper Mapper => _mapper ??= HttpContext.RequestServices.GetService<IMapper>();
+        protected IMapper Mapper => _mapperInstance ??= HttpContext.RequestServices.GetService<IMapper>();
     }
 }

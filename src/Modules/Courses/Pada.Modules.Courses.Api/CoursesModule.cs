@@ -20,15 +20,15 @@ namespace Pada.Modules.Courses.Api
             Configuration = configuration;
         }
 
-        public void ConfigureServices(IServiceCollection services)
+        public void Register(IServiceCollection services)
         {
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment environment)
+        public void Use(IApplicationBuilder app, IWebHostEnvironment environment)
         {
         }
 
-        public void ConfigureEndpoints(IEndpointRouteBuilder endpoints)
+        public void EndpointsConfigure(IEndpointRouteBuilder endpoints)
         {
             endpoints.MapGet(Path, ctx => ctx.Response.WriteAsync($"{Name} module"));
             endpoints.MapGet($"{Path}/ping", ctx => ctx.Response.WriteAsJsonAsync(true));

@@ -7,10 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\..\Modules\Courses\Pada.Modules.Courses.Api\Pada.Modules.Courses.Api.csproj" />
       <ProjectReference Include="..\..\Modules\Identity\Pada.Modules.Identity.Api\Pada.Modules.Identity.Api.csproj" />
     </ItemGroup>

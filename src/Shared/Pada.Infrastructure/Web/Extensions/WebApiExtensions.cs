@@ -6,15 +6,13 @@ using Pada.Infrastructure.App;
 
 namespace Pada.Infrastructure.Web.Extensions
 {
-    public static class ServiceCollectionExtensions
+    public static class WebApiExtensions
     {
         private const string AppOptionsSectionName = nameof(AppOptions);
-        private const string ExecutionContextSection = "ExecutionContextOptions";
 
         public static IServiceCollection AddWebApi(this IServiceCollection services,
-            IConfiguration configuration,
-            string appOptionSection = AppOptionsSectionName,
-            string executionContextSection = ExecutionContextSection)
+            ConfigurationManager configuration,
+            string appOptionSection = AppOptionsSectionName)
         {
             services.AddHttpContextAccessor();
             
