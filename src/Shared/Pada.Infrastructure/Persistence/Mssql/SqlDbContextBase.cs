@@ -1,5 +1,7 @@
 ﻿using System.Data;
+using System.Reflection;
 using System.Threading.Tasks;
+using DbUp;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Pada.Abstractions.Persistence;
@@ -16,9 +18,19 @@ namespace Pada.Infrastructure.Persistence.Mssql
         protected SqlDbContextBase(DbContextOptions<SqlDbContextBase> options) : base(options)
         {
             Database.EnsureCreated();
-            Extensions.DbUpInitializer.Initialize(Database.GetConnectionString());
+            DbUpInitializer(Database.GetConnectionString());
         }
         
+        protected void DbUpInitializer(string connection)
+        {
+            var upgrader =
+                DeployChanges.To
+                    .SqlDatabase(connection)
+                    .WithScriptsEmbeddedInAssembly(Assembly.GetExecutingAssembly())
+                    .LogToConsole()
+                    .Build();
+            var result = upgrader.PerformUpgrade();
+        }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

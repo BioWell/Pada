@@ -11,7 +11,8 @@ using Pada.Infrastructure.Exceptions;
 
 namespace Pada.Infrastructure.Persistence.Mssql
 {
-    public class RepositoryBase<TDbContext, TEntity, TId, TIdentity> : IRepository<TEntity, TId, TIdentity>
+    public class RepositoryBase<TDbContext, TEntity, TId, TIdentity> : 
+        IRepository<TEntity, TId, TIdentity>
         where TEntity : AggregateRoot<TId, TIdentity>
         where TDbContext : DbContext, ISqlDbContext
         where TIdentity : IdentityBase<TId>
@@ -139,7 +140,8 @@ namespace Pada.Infrastructure.Persistence.Mssql
         }
     }
 
-    public class RepositoryBase<TDbContext, TEntity> : RepositoryBase<TDbContext, TEntity, Guid, AggregateId>
+    public class RepositoryBase<TDbContext, TEntity> : 
+        RepositoryBase<TDbContext, TEntity, Guid, AggregateId>
         where TEntity : AggregateRoot
         where TDbContext : DbContext, ISqlDbContext
     {

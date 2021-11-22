@@ -3,7 +3,7 @@ using Pada.Abstractions.Domain.Types;
 using Pada.Infrastructure.Persistence.Mssql;
 using Pada.Modules.Identity.Infrastructure.Persistence;
 
-namespace Pada.Modules.Identity.Infrastructure.Services
+namespace Pada.Modules.Identity.Infrastructure
 {
     public class Repository<TEntity, TId, TIdentity> : RepositoryBase<AppIdentityDbContext, TEntity, TId, TIdentity>
         where TEntity : AggregateRoot<TId, TIdentity>

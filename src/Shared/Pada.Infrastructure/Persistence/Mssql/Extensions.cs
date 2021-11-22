@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Reflection;
-using DbUp;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Pada.Abstractions.Persistence.Mssql;
@@ -17,6 +15,8 @@ namespace Pada.Infrastructure.Persistence.Mssql
             Action<DbContextOptionsBuilder> optionBuilder = null)
             where TContext : DbContext, ISqlDbContext, IDbFacadeResolver //, IDomainEventContext
         {
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            
             if (string.IsNullOrWhiteSpace(connection)) throw CoreException.NullArgument(connection);
 
             services.AddDbContext<TContext>(options =>
@@ -36,23 +36,7 @@ namespace Pada.Infrastructure.Persistence.Mssql
             
             configurator?.Invoke(services);
             
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
-            
             return services;
-        }
-
-        public static class DbUpInitializer
-        {
-            public static void Initialize(string connection)
-            {
-                var upgrader =
-                    DeployChanges.To
-                        .SqlDatabase(connection)
-                        .WithScriptsEmbeddedInAssembly(Assembly.GetExecutingAssembly())
-                        .LogToConsole()
-                        .Build();
-                var result = upgrader.PerformUpgrade();
-            }
         }
     }
 }
