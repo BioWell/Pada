@@ -8,14 +8,14 @@ using Pada.Modules.Identity.Infrastructure.Persistence.Configurations;
 
 namespace Pada.Modules.Identity.Infrastructure.Persistence
 {
-    public sealed class IdentityDbContext : IdentityDbContext<
+    public sealed class AppIdentityDbContext : IdentityDbContext<
             AppUser, AppRole, string,
             IdentityUserClaim<string>,
             AppUserRole, IdentityUserLogin<string>,
             IdentityRoleClaim<string>, IdentityUserToken<string>>,
         IIdentityDbContext
     {
-        public IdentityDbContext(DbContextOptions<IdentityDbContext> options) : base(options)
+        public AppIdentityDbContext(DbContextOptions<IdentityDbContext> options) : base(options)
         {
         }
         
