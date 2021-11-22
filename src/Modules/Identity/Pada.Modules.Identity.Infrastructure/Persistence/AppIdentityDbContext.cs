@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using EntityFramework.Exceptions.SqlServer;
+using Pada.Abstractions.Persistence;
 using Pada.Modules.Identity.Infrastructure.Aggregates.Roles;
 using Pada.Modules.Identity.Infrastructure.Aggregates.Users;
 using Pada.Modules.Identity.Infrastructure.Persistence.Configurations;
@@ -13,9 +15,9 @@ namespace Pada.Modules.Identity.Infrastructure.Persistence
             IdentityUserClaim<string>,
             AppUserRole, IdentityUserLogin<string>,
             IdentityRoleClaim<string>, IdentityUserToken<string>>,
-        IIdentityDbContext
+        IAppIdentityDbContext
     {
-        public AppIdentityDbContext(DbContextOptions<IdentityDbContext> options) : base(options)
+        public AppIdentityDbContext(DbContextOptions<AppIdentityDbContext> options) : base(options)
         {
         }
         
@@ -54,6 +56,18 @@ namespace Pada.Modules.Identity.Infrastructure.Persistence
             builder.Entity<AppRole>(b => { b.ToTable("Role"); }).HasDefaultSchema("identities");
             builder.Entity<AppUserRole>(b => { b.ToTable("UserRoles"); }).HasDefaultSchema("identities");
             builder.Entity<IdentityRoleClaim<string>>(b => { b.ToTable("RoleClaim"); }).HasDefaultSchema("identities");
+        }
+
+        public DbSet<OutboxMessage> OutboxMessages { get; set; }
+        
+        public Task BeginTransactionAsync()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task RollbackTransaction()
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

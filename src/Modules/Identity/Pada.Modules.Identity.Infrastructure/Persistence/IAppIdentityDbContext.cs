@@ -2,8 +2,7 @@
 
 namespace Pada.Modules.Identity.Infrastructure.Persistence
 {
-    public interface IIdentityDbContext : ISqlDbContext
+    public interface IAppIdentityDbContext : ISqlDbContext
     {
-        
     }
 }

@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Pada.Infrastructure.Domain.Types;
+using Pada.Abstractions.Domain.Types;
 
 namespace Pada.Modules.Identity.Domain.Aggregates.Users
 {

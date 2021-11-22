@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Pada.Abstractions.Domain;
-using Pada.Infrastructure.Domain.Exception;
 
-namespace Pada.Infrastructure.Domain.Types
+namespace Pada.Abstractions.Domain.Types
 {
     public abstract class ValueObject : IEquatable<ValueObject>, ICloneable
     {
@@ -51,7 +49,7 @@ namespace Pada.Infrastructure.Domain.Types
 
         protected static void CheckRule(IBusinessRule rule)
         {
-            if (rule.IsBroken()) throw new BusinessRuleValidationException(rule);
+            if (rule.IsBroken()) throw new BusinessRuleException(rule);
         }
 
         public virtual object Clone() => MemberwiseClone();
