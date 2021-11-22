@@ -10,4 +10,9 @@
       <ProjectReference Include="..\Pada.Modules.Courses.Application\Pada.Modules.Courses.Application.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Remove="Aggregates\Users\AppRole.cs" />
+      <Compile Remove="Aggregates\Users\AppUser.cs" />
+    </ItemGroup>
+
 </Project>

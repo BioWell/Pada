@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using AutoMapper.Configuration;
+using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -22,6 +23,7 @@ namespace Pada.Infrastructure
             // 1. Controller MediatR & AutoMapper & Application layer
             services.AddMediatR(Assembly.GetExecutingAssembly());
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
+            services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
             
             // 2. DbSet 
             //   Domain event & log
@@ -54,6 +56,7 @@ namespace Pada.Infrastructure
             // app.UseHttpsRedirection();
             
             app.UseRouting();
+            app.UseAuthentication();
             app.UseAuthorization();
             foreach (var module in modules)
             {

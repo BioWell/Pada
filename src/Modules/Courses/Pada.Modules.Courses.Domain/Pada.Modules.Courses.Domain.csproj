@@ -11,4 +11,11 @@
       <ProjectReference Include="..\..\..\Shared\Pada.Infrastructure\Pada.Infrastructure.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Remove="Aggregates\Users\Role.cs" />
+      <Compile Remove="Aggregates\Users\User.cs" />
+      <Compile Remove="Aggregates\Users\AccountState.cs" />
+      <Compile Remove="Aggregates\Users\Permission.cs" />
+    </ItemGroup>
+
 </Project>
