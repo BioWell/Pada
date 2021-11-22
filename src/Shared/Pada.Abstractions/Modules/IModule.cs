@@ -10,7 +10,7 @@ namespace Pada.Abstractions.Modules
     {
         string Name { get; }
         string Path { get; }
-        void Init(IConfiguration configuration);
+        void Init(ConfigurationManager configuration);
         void Register(IServiceCollection services);
         void Use(IApplicationBuilder app, IWebHostEnvironment environment);
         void EndpointsConfigure(IEndpointRouteBuilder endpoints);

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Pada.Abstractions.Modules;
+using Pada.Modules.Identity.Infrastructure;
 
 namespace Pada.Modules.Identity.Api
 {
@@ -13,15 +14,16 @@ namespace Pada.Modules.Identity.Api
         public const string ModulePath = "identity";
         public string Name => "Identity";
         public string Path => ModulePath;
-        public IConfiguration Configuration { get; private set; } = null!;
+        public ConfigurationManager Configuration { get; private set; } = null!;
 
-        public void Init(IConfiguration configuration)
+        public void Init(ConfigurationManager configuration)
         {
             Configuration = configuration;
         }
 
         public void Register(IServiceCollection services)
         {
+            services.AddIdentityInfrastructure(Configuration);
         }
 
         public void Use(IApplicationBuilder app, IWebHostEnvironment environment)

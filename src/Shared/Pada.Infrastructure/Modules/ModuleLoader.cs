@@ -32,7 +32,7 @@ namespace Pada.Infrastructure.Modules
             return builder;
         }
         
-        public static IList<Assembly> LoadAssemblies(IConfiguration configuration)
+        public static IList<Assembly> LoadAssemblies(ConfigurationManager configuration)
         {
             var assemblies = AppDomain.CurrentDomain.GetAssemblies()
                 .Where(x => x.FullName?.Contains(ModulePart) ?? false)

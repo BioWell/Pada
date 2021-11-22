@@ -13,9 +13,9 @@ namespace Pada.Modules.Courses.Api
         public const string ModulePath = "courses";
         public string Name => "Courses";
         public string Path => ModulePath;
-        public IConfiguration Configuration { get; private set; } = null!;
+        public ConfigurationManager Configuration { get; private set; } = null!;
 
-        public void Init(IConfiguration configuration)
+        public void Init(ConfigurationManager configuration)
         {
             Configuration = configuration;
         }
