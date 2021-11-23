@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Pada.Infrastructure.Web;
 using Pada.Modules.Identity.Api.Users.Models.Requests;
-using Pada.Modules.Identity.Application.Users.Dtos;
 using Pada.Modules.Identity.Application.Users.Dtos.UseCaseResponses;
 using Pada.Modules.Identity.Application.Users.Features.GetUserById;
 using Pada.Modules.Identity.Application.Users.Features.RegisterNewUser;

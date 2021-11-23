@@ -65,6 +65,7 @@ namespace Pada.Infrastructure
             }
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapDefaultControllerRoute();
                 endpoints.MapControllers(); //.RequireAuthorization(); //enforce all controller tp authorize. we use AllowAnonymous attribute to bypass this rule
                 endpoints.MapGet("/", context => context.Response.WriteAsync("Online Store API!"));
                 foreach (var module in modules)
