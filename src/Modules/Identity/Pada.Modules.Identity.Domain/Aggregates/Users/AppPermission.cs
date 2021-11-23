@@ -14,8 +14,13 @@ namespace Pada.Modules.Identity.Domain.Aggregates.Users
         {
             Name = name;
             GroupName = groupName;
-        } 
-        
+        }
+
+        public static AppPermission Of(string name, string? groupName = null)
+        {
+            return new(name, groupName);
+        }
+
         protected override IEnumerable<object> GetEqualityComponents()
         {
             yield return Name;

@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Pada.Modules.Identity.Application.Users.Dtos.GatewayResponses;
 using Pada.Modules.Identity.Domain.Aggregates.Users;
 
 namespace Pada.Modules.Identity.Application.Users.Contracts
@@ -8,5 +9,6 @@ namespace Pada.Modules.Identity.Application.Users.Contracts
         Task<User> FindByIdAsync(string id, bool invalidateCache = false);
         Task<User> FindByEmailAsync(string email, bool invalidateCache = false);
         Task<User> FindByNameAsync(string userName, bool invalidateCache = false);
+        Task<CreateUserResponse> AddAsync(User user);
     }
 }

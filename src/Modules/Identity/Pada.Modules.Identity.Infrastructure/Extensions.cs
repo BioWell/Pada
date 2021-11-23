@@ -77,12 +77,6 @@ namespace Pada.Modules.Identity.Infrastructure
             
             services.Configure<IdentityOptions>(configuration.GetSection(identitySectionName));
             
-            return services;
-        }
-        
-        public static IServiceCollection AddIdentityApplication(this IServiceCollection services)
-        {
-            services.AddAutoMapper(Assembly.GetExecutingAssembly());
             services.AddMediatR(Assembly.GetExecutingAssembly());
             return services;
         }

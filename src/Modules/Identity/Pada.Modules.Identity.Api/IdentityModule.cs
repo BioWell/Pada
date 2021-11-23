@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Pada.Abstractions.Modules;
+using Pada.Modules.Identity.Application;
+using Pada.Modules.Identity.Application.Users.Features.GetUserById;
+using Pada.Modules.Identity.Application.Users.Features.RegisterNewUser;
 using Pada.Modules.Identity.Infrastructure;
 
 namespace Pada.Modules.Identity.Api
@@ -25,9 +28,10 @@ namespace Pada.Modules.Identity.Api
 
         public void Register(IServiceCollection services)
         {
+            // For UsersMapping
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
-            services.AddMediatR(Assembly.GetExecutingAssembly());
             services.AddIdentityInfrastructure(Configuration);
+            services.AddIdentityApplication();
         }
 
         public void Use(IApplicationBuilder app, IWebHostEnvironment environment)

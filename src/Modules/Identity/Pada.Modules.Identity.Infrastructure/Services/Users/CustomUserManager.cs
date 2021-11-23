@@ -22,5 +22,51 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
             : base(store, optionsAccessor, passwordHasher, userValidators, passwordValidators, keyNormalizer, errors, services, logger)
         {
         }
+        
+        // public override async Task<AppUser> FindByEmailAsync(string email)
+        // {
+        //     var user = await base.FindByEmailAsync(email);
+        //     if (user != null)
+        //     {
+        //         await LoadUserDetailsAsync(user);
+        //     }
+        //
+        //     return user;
+        // }
+        //
+        // public override async Task<AppUser> FindByNameAsync(string userName)
+        // {
+        //     var user = await base.FindByNameAsync(userName);
+        //     if (user != null)
+        //     {
+        //         await LoadUserDetailsAsync(user);
+        //     }
+        //
+        //     return user;
+        // }
+        //
+        // public override async Task<AppUser> FindByIdAsync(string userId)
+        // {
+        //     var user = await base.FindByIdAsync(userId);
+        //     if (user != null)
+        //     {
+        //         await LoadUserDetailsAsync(user);
+        //     }
+        //
+        //     return user;
+        // }
+        //
+        // protected virtual async Task LoadUserDetailsAsync(AppUser user)
+        // {
+        //     if (user == null)
+        //     {
+        //         throw new ArgumentNullException(nameof(user));
+        //     }
+        //
+        //     // await LoadRelatedRoles(user);
+        //     // await LoadRelatedPermissions(user);
+        //     // await LoadRelatedRefreshTokens(user);
+        //     // await LoadRelatedLogins(user);
+        // }
     }
 }

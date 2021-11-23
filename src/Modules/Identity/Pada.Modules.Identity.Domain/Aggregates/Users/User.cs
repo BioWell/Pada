@@ -95,7 +95,61 @@ namespace Pada.Modules.Identity.Domain.Aggregates.Users
             {
             };
             
+            user.SetPersonalInformation(firstName, lastName, name.Trim(), email?.ToLowerInvariant(), phoneNumber,
+                photoUrl);
+            user.SetUserName(userName);
+            user.SetStatus(status);
+            user.SetUserType(userType);
             return user;
+        }
+        
+        private void SetPersonalInformation(string firstName, string lastName,
+            string name, string email, string phoneNumber, string photoUrl)
+        {
+            FirstName = firstName;
+            LastName = lastName;
+            Name = name;
+            PhoneNumber = phoneNumber;
+            PhotoUrl = photoUrl;
+            Email = email;
+        }
+        
+        private void SetUserName(string userName)
+        {
+            UserName = userName;
+        }
+        
+        private void SetStatus(string status)
+        {
+            if (string.IsNullOrEmpty(status))
+                return;
+            Status = status;
+        }
+        
+        private void SetUserType(UserType userType)
+        {
+            UserType = userType;
+        }
+        
+        public void ChangePermissions(IList<AppPermission> permissions)
+        {
+            if (permissions is null)
+                return;
+            _permissions = permissions.ToList();
+        }
+        
+        public void ChangeRoles(IList<Role> roles)
+        {
+            if (roles is null)
+                return;
+            _roles = roles.ToList();
+        }
+        
+        public void ChangeRefreshTokens(IList<AppRefreshToken> refreshTokens)
+        {
+            if (refreshTokens is null)
+                return;
+            _refreshTokens = refreshTokens.ToList();
         }
     }
 }

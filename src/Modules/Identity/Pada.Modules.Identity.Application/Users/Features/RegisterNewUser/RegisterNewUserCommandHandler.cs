@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
 using MediatR;
@@ -56,6 +57,14 @@ namespace Pada.Modules.Identity.Application.Users.Features.RegisterNewUser
                 command.EmailConfirmed,
                 command.PhotoUrl,
                 command.Status);
+            
+            user.ChangePermissions(command.Permissions?.Select(x => AppPermission.Of(x, "")).ToArray());
+            user.ChangeRoles(command.Roles?.Select(x => Role.Of(x, x)).ToArray());
+            
+            var result = await _userRepository.AddAsync(user);
+            if (result.IsSuccess == false)
+                throw new RegisterNewUserFailedException(user.UserName);
+            _logger.LogInformation("Created an account for the user with ID: '{Id}'.", user.Id);
             
             //Option1: Using our transactional middleware for publishing domain events and integration events automatically
             //Option 2: Explicit calling domain events
