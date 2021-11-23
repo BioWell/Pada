@@ -12,8 +12,8 @@ using Pada.Modules.Identity.Infrastructure.Persistence;
 namespace Pada.Modules.Identity.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppIdentityDbContext))]
-    [Migration("20211122124747_initial")]
-    partial class initial
+    [Migration("20211123044243_Identity")]
+    partial class Identity
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

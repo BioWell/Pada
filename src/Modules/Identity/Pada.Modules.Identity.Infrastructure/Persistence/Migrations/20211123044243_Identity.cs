@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Pada.Modules.Identity.Infrastructure.Persistence.Migrations
 {
-    public partial class initial : Migration
+    public partial class Identity : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

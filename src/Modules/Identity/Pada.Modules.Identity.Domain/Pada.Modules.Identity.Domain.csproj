@@ -13,7 +13,6 @@
     <ItemGroup>
       <Folder Include="Aggregates\Users\DomainEvents" />
       <Folder Include="Aggregates\Users\DomainExceptions" />
-      <Folder Include="Aggregates\Users\Types" />
     </ItemGroup>
 
 </Project>

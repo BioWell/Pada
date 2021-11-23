@@ -1,81 +1,81 @@
 ﻿using System;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Pada.Abstractions.Persistence;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Pada.Abstractions.Persistence.Mssql;
 using Pada.Infrastructure.Persistence.Mssql;
+using Pada.Modules.Identity.Application;
+using Pada.Modules.Identity.Application.Users.Contracts;
+using Pada.Modules.Identity.Infrastructure.Aggregates.Roles;
+using Pada.Modules.Identity.Infrastructure.Aggregates.Users;
 using Pada.Modules.Identity.Infrastructure.Persistence;
+using Pada.Modules.Identity.Infrastructure.Services.Roles;
+using Pada.Modules.Identity.Infrastructure.Services.Users;
 
 namespace Pada.Modules.Identity.Infrastructure
 {
     public static class Extensions
     {
-        private const string SectionName = nameof(MssqlOptions);
+        private const string MssqlSectionName = nameof(MssqlOptions);
+        
+        private const string IdentitySectionName = nameof(IdentityOptions);
 
         public static IServiceCollection AddIdentityInfrastructure(this IServiceCollection services,
             ConfigurationManager configuration,
-            string sectionName = SectionName)
+            string mssqlSectionName = MssqlSectionName,
+            string identitySectionName = IdentitySectionName)
         {
-            if (string.IsNullOrWhiteSpace(sectionName))
-                sectionName = SectionName;
+            if (string.IsNullOrWhiteSpace(mssqlSectionName))
+                mssqlSectionName = MssqlSectionName;
 
-            services.Configure<MssqlOptions>(configuration.GetSection(sectionName));
-            var mssqlOptions = configuration.GetSection(sectionName).Get<MssqlOptions>();
+            services.Configure<MssqlOptions>(configuration.GetSection(mssqlSectionName));
+            var mssqlOptions = configuration.GetSection(mssqlSectionName).Get<MssqlOptions>();
 
-            services.AddMssqlPersistence<AppIdentityDbContext>(
-                    mssqlOptions.ConnectionString,
-                    configurator: s => { s.AddRepository(typeof(Repository<>)); }, 
-                    optionBuilder: options =>
-                    {
-                        // options.UseTriggers(triggerOptions => {
-                        //     triggerOptions.AddTrigger<AuditTrigger>();
-                        // });
-                    })
+            services.AddMssqlPersistence<AppIdentityDbContext>(mssqlOptions.ConnectionString)
                 .AddScoped<IAppIdentityDbContext>(provider => provider.GetRequiredService<AppIdentityDbContext>());
-            return services;
-        }
 
-        private static IServiceCollection AddRepository(this IServiceCollection services, Type repoType)
-        {
-            services.Scan(scan => scan
-                .FromAssembliesOf(repoType)
-                .AddClasses(classes =>
-                    classes.AssignableTo(repoType)).As(typeof(IRepository<,,>)).WithScopedLifetime()
-            );
+            services.TryAddTransient<IUserRepository, UserRepository>();
+            
+            //Identity dependencies override
+            services.TryAddScoped<RoleManager<AppRole>, CustomRoleManager>();
+            services.TryAddSingleton<Func<RoleManager<AppRole>>>(provider =>
+                () => provider.CreateScope().ServiceProvider.GetRequiredService<RoleManager<AppRole>>());
+            
+            services.TryAddScoped<UserManager<AppUser>, CustomUserManager>();
+            services.TryAddSingleton<Func<UserManager<AppUser>>>(provider =>
+                () => provider.CreateScope().ServiceProvider.GetRequiredService<UserManager<AppUser>>());
+            
+            services.TryAddSingleton<Func<SignInManager<AppUser>>>(provider =>
+                () => provider.CreateScope().ServiceProvider.GetRequiredService<SignInManager<AppUser>>());
+            
+            services.TryAddScoped<IUserClaimsPrincipalFactory<AppUser>, CustomUserClaimsPrincipalFactory>();
+            
+            services.AddIdentity<AppUser, AppRole>(options => options.Stores.MaxLengthForKeys = 128)
+                .AddEntityFrameworkStores<AppIdentityDbContext>()
+                .AddUserManager<CustomUserManager>()
+                .AddRoleManager<CustomRoleManager>()
+                .AddDefaultTokenProviders();
 
+            services.Configure<IdentityOptions>(options =>
+            {
+                options.Password.RequireDigit = false;
+                options.Password.RequiredLength = 6;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+                options.Lockout.AllowedForNewUsers = true;
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(10);
+                options.Lockout.MaxFailedAccessAttempts = 3;
+            });
+            
+            if (string.IsNullOrWhiteSpace(identitySectionName))
+                identitySectionName = IdentitySectionName;
+            
+            services.Configure<IdentityOptions>(configuration.GetSection(identitySectionName));
+            
             return services;
         }
     }
 }
-
-
-// if (string.IsNullOrWhiteSpace(sectionName)) sectionName = SectionName;
-//
-// services.Configure<MssqlOptions>(configuration.GetSection(sectionName));
-// var mssqlOptions = configuration.GetSection(sectionName).Get<MssqlOptions>();
-// services.AddDbContext<AppIdentityDbContext>(optionsBuilder =>
-//     {
-//         optionsBuilder.EnableSensitiveDataLogging(true);
-//         optionsBuilder.UseSqlServer(mssqlOptions.ConnectionString);
-//     })
-//     .AddScoped<IAppIdentityDbContext>(provider => provider.GetService<AppIdentityDbContext>())
-//     .AddIdentity<AppUser, AppRole>(identityOptions =>
-//     {
-//         identityOptions.Password.RequireDigit = false;
-//         identityOptions.Password.RequiredLength = 4;
-//         identityOptions.Password.RequireNonAlphanumeric = false;
-//         identityOptions.Password.RequireUppercase = false;
-//         identityOptions.Password.RequireLowercase = false;
-//         identityOptions.Password.RequiredUniqueChars = 0;
-//
-//         identityOptions.User.RequireUniqueEmail = true;
-//
-//         identityOptions.SignIn.RequireConfirmedEmail = true;
-//         // TO DO
-//         // identityOptions.Tokens.EmailConfirmationTokenProvider = "emailconf";
-//         identityOptions.Lockout.AllowedForNewUsers = true;
-//         identityOptions.Lockout.MaxFailedAccessAttempts = 3;
-//         identityOptions.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(1);
-//     })
-//     .AddEntityFrameworkStores<AppIdentityDbContext>()
-//     .AddDefaultTokenProviders();

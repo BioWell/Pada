@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System.Reflection;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -23,6 +24,7 @@ namespace Pada.Modules.Identity.Api
 
         public void Register(IServiceCollection services)
         {
+            services.AddAutoMapper(Assembly.GetExecutingAssembly());
             services.AddIdentityInfrastructure(Configuration);
         }
 

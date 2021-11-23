@@ -11,6 +11,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="Ardalis.GuardClauses" Version="3.3.0" />
       <PackageReference Include="AutoMapper" Version="10.1.1" />
       <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
       <PackageReference Include="dbup-sqlserver" Version="4.5.0" />
@@ -23,6 +24,7 @@
       <PackageReference Include="FluentValidation.AspNetCore" Version="10.3.4" />
       <PackageReference Include="MediatR" Version="9.0.0" />
       <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
+      <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.0.0" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.0" />
       <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
       <PackageReference Include="Scrutor" Version="3.3.0" />

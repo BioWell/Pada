@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using EntityFramework.Exceptions.SqlServer;
 using Pada.Abstractions.Persistence;
+using Pada.Modules.Identity.Application;
 using Pada.Modules.Identity.Infrastructure.Aggregates.Roles;
 using Pada.Modules.Identity.Infrastructure.Aggregates.Users;
 using Pada.Modules.Identity.Infrastructure.Persistence.Configurations;

@@ -10,9 +10,7 @@ namespace Pada.Infrastructure.Persistence.Mssql
     {
         public static IServiceCollection AddMssqlPersistence<TContext>(
             this IServiceCollection services,
-            string connection,
-            Action<IServiceCollection> configurator = null,
-            Action<DbContextOptionsBuilder> optionBuilder = null)
+            string connection)
             where TContext : DbContext, ISqlDbContext, IDbFacadeResolver //, IDomainEventContext
         {
             services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -21,21 +19,17 @@ namespace Pada.Infrastructure.Persistence.Mssql
 
             services.AddDbContext<TContext>(options =>
                 {
-                    //adding all existing triggers dynamically 
-                    options.EnableSensitiveDataLogging(true);
+                    // options.EnableSensitiveDataLogging(true);
                     options.UseTriggers(triggerOptions => triggerOptions.AddAssemblyTriggers(typeof(TContext).Assembly));
                     options.UseSqlServer(connection, sqlOptions =>
                     {
                         sqlOptions.MigrationsAssembly(typeof(TContext).Assembly.GetName().Name);
                         sqlOptions.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
                     });
-                    optionBuilder?.Invoke(options);
                 })
                 .AddScoped<ISqlDbContext>(ctx => ctx.GetRequiredService<TContext>())
                 .AddScoped<IDbFacadeResolver>(ctx => ctx.GetRequiredService<TContext>());
-            
-            configurator?.Invoke(services);
-            
+
             return services;
         }
     }
