@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -25,6 +26,7 @@ namespace Pada.Modules.Identity.Api
         public void Register(IServiceCollection services)
         {
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
+            services.AddMediatR(Assembly.GetExecutingAssembly());
             services.AddIdentityInfrastructure(Configuration);
         }
 
