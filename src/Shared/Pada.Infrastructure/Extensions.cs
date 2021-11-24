@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Pada.Abstractions.Modules;
+using Pada.Infrastructure.Caching;
 using Pada.Infrastructure.Exceptions;
 using Pada.Infrastructure.Logging;
 using Pada.Infrastructure.Validations;
@@ -46,6 +47,7 @@ namespace Pada.Infrastructure
             // 3. WebApi 
             services.AddWebApi(configuration);
             services.AddEndpointsApiExplorer();
+            services.AddCaching(configuration);
             // services.AddSwaggerGen();
             
             // 4. Register Exceptions services

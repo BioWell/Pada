@@ -15,6 +15,9 @@
       <PackageReference Include="AutoMapper" Version="10.1.1" />
       <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
       <PackageReference Include="dbup-sqlserver" Version="4.5.0" />
+      <PackageReference Include="EasyCaching.Core" Version="1.4.1" />
+      <PackageReference Include="EasyCaching.InMemory" Version="1.4.1" />
+      <PackageReference Include="EasyCaching.Redis" Version="1.4.1" />
       <PackageReference Include="EntityFrameworkCore.Exceptions.SqlServer" Version="3.1.4" />
       <PackageReference Include="EntityFrameworkCore.Triggered" Version="3.0.0" />
       <PackageReference Include="EntityFrameworkCore.Triggered.Abstractions" Version="3.0.0" />

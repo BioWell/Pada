@@ -1,26 +1,33 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using EasyCaching.Core;
 using Microsoft.AspNetCore.Identity;
+using Pada.Infrastructure.Caching;
 using Pada.Infrastructure.Types;
 using Pada.Modules.Identity.Application.Users.Contracts;
 using Pada.Modules.Identity.Application.Users.Dtos.GatewayResponses;
 using Pada.Modules.Identity.Domain.Aggregates.Users;
-using Pada.Modules.Identity.Infrastructure.Persistence;
 
 namespace Pada.Modules.Identity.Infrastructure.Services.Users
 {
     public class UserRepository : IUserRepository
     {
         private readonly CustomUserManager _userManager;
+        private readonly IEasyCachingProvider _cachingProvider;
 
-        public UserRepository(CustomUserManager userManager)
+        public UserRepository(CustomUserManager userManager, 
+            IEasyCachingProvider cachingProvider)
         {
             _userManager = userManager;
+            _cachingProvider = cachingProvider;
         }
 
         public async Task<User> FindByIdAsync(string id, bool invalidateCache = false)
         {
+            if (invalidateCache)
+                await InvalidateCache(CacheKey.With(nameof(FindByIdAsync), id));
+            
             var appUser = await _userManager.FindByIdAsync(id);
             return appUser?.ToUser();
         }
@@ -53,6 +60,11 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
 
             return new CreateUserResponse(Guid.Parse(appUser.Id), identityResult.Succeeded,
                 identityResult.Errors.Select(e => new Error(e.Code, e.Description)));
+        }
+        
+        private async Task InvalidateCache(string key)
+        {
+            await _cachingProvider.RemoveAsync(key);
         }
     }
 }
