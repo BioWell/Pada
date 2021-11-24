@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
@@ -29,18 +30,19 @@ namespace Pada.Modules.Identity.Application.Users.Features.RegisterNewUser
             CancellationToken cancellationToken = default)
         {
             Guard.Against.Null(command, nameof(RegisterNewUserCommand));
+            
             var user = await _userRepository.FindByEmailAsync(command.Email);
             if (user is { })
             {
-                _logger.LogError("Email '{Email}' already in used", command.Email);
+                _logger.LogError($"Email '{command.Email}' already in used");
                 throw new EmailAlreadyInUsedException(command.Email);
             }
             
             user = await _userRepository.FindByNameAsync(command.Name);
             if (user is { })
             {
-                _logger.LogError("UserName '{UserName}' already in used", command.UserName);
-                throw new UserNameAlreadyInUseException(command.UserName);
+                _logger.LogError($"Name '{command.Name}' already in used");
+                throw new UserNameAlreadyInUseException(command.Name);
             }
             
             user = User.Create(command.Id,
@@ -60,10 +62,10 @@ namespace Pada.Modules.Identity.Application.Users.Features.RegisterNewUser
             
             user.ChangePermissions(command.Permissions?.Select(x => AppPermission.Of(x, "")).ToArray());
             user.ChangeRoles(command.Roles?.Select(x => Role.Of(x, x)).ToArray());
-            
+
             var result = await _userRepository.AddAsync(user);
             if (result.IsSuccess == false)
-                throw new RegisterNewUserFailedException(user.UserName);
+                throw new RegisterNewUserFailedException(user.Name);
             _logger.LogInformation("Created an account for the user with ID: '{Id}'.", user.Id);
             
             //Option1: Using our transactional middleware for publishing domain events and integration events automatically

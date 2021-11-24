@@ -38,7 +38,7 @@ namespace Pada.Modules.Identity.Infrastructure
 
             var applicationUser = new AppUser
             {
-                Name = user.UserName,
+                Name = user.Name,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Email = user.Email,

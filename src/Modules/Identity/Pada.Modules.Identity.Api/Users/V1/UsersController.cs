@@ -27,6 +27,9 @@ namespace Pada.Modules.Identity.Api.Users.V1
         [AllowAnonymous]
         public async Task<ActionResult> RegisterAsync(RegisterNewUserRequest request)
         {
+            if (request.Id is null) request.Id = Guid.NewGuid();
+            if (request.UserName is null) request.UserName = request.Email;
+            
             var command = Mapper.Map<RegisterNewUserCommand>(request);
             await Mediator.Send(command);
             var name = nameof(GetUserByIdAsync);

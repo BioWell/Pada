@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Microsoft.Extensions.Localization;
 
 namespace Pada.Modules.Identity.Application.Users.Features.RegisterNewUser
 {
@@ -6,8 +7,15 @@ namespace Pada.Modules.Identity.Application.Users.Features.RegisterNewUser
     {
         public RegisterNewUserCommandValidator()
         {
-            RuleFor(x => x.Name).NotEmpty().WithMessage("UserNameOrEmail cannot be empty");
-            RuleFor(x => x.Password).NotEmpty().WithMessage("password cannot be empty");
+            RuleFor(c => c.Name)
+                .NotEmpty().WithMessage("The {PropertyName} field is required.")
+                .Length(2, 150).WithMessage("The {PropertyName} property must have between 2 and 150 characters.");
+            RuleFor(c => c.Password)
+                .NotEmpty().WithMessage("The {PropertyName} field is required.")
+                .Length(6, 30).WithMessage("The {PropertyName} must be great than 6 characters.");
+            RuleFor(c => c.Email)
+                .NotEmpty().WithMessage("The {PropertyName} field is required.")
+                .EmailAddress().WithMessage("Invalid Email Address.");
         }
     }
 }
