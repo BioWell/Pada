@@ -18,8 +18,7 @@ namespace Pada.Infrastructure.Web.Extensions
             
             var appOptions = configuration.GetSection(appOptionSection).Get<AppOptions>();
             services.AddOptions<AppOptions>().Bind(configuration.GetSection(appOptionSection));
-                // .ValidateDataAnnotations();
-            
+       
             services.AddControllers()
                 .ConfigureApplicationPartManager(manager =>
                 {

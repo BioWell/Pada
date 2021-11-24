@@ -21,7 +21,7 @@ namespace Pada.Modules.Identity.Api.Users.V1
         {
             _httpContextAccessor = httpContextAccessor;
         }
-        
+
         // POST api/v1/identity/users
         [HttpPost]
         [AllowAnonymous]
@@ -29,20 +29,20 @@ namespace Pada.Modules.Identity.Api.Users.V1
         {
             if (request.Id is null) request.Id = Guid.NewGuid();
             if (request.UserName is null) request.UserName = request.Email;
-            
+
             var command = Mapper.Map<RegisterNewUserCommand>(request);
             await Mediator.Send(command);
             var name = nameof(GetUserByIdAsync);
-            return CreatedAtAction(name, new { id = command.Id }, command);
+            return CreatedAtRoute(name, new {id = command.Id}, command);
         }
-        
+
         // GET api/v1/identity/users/id/{userId}
-        [HttpGet("id/{id}")]
+        [HttpGet("id/{id}", Name = nameof(GetUserByIdAsync))]
         [AllowAnonymous]
         public async Task<ActionResult<UserDto>> GetUserByIdAsync([FromRoute] Guid id)
         {
             var result = await Mediator.Send(new GetUserByIdQuery(id));
-  
+
             return Ok(result);
         }
     }
