@@ -22,6 +22,8 @@
       <PackageReference Include="Figgle" Version="0.4.0" />
       <PackageReference Include="FluentValidation" Version="10.3.4" />
       <PackageReference Include="FluentValidation.AspNetCore" Version="10.3.4" />
+      <PackageReference Include="Hellang.Middleware.ProblemDetails" Version="6.2.0" />
+      <PackageReference Include="Humanizer" Version="2.13.14" />
       <PackageReference Include="MediatR" Version="9.0.0" />
       <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
       <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.0.0" />

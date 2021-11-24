@@ -16,7 +16,7 @@ namespace Pada.Modules.Identity.Domain.Aggregates.Users
             GroupName = groupName;
         }
 
-        public static AppPermission Of(string name, string? groupName = null)
+        public static AppPermission Of(string name, string groupName = null)
         {
             return new(name, groupName);
         }

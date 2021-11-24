@@ -31,7 +31,7 @@ namespace Pada.Modules.Identity.Infrastructure
             return user;
         }
         
-        public static AppUser? ToApplicationUser(this User? user)
+        public static AppUser ToApplicationUser(this User user)
         {
             if (user is null)
                 return null;
