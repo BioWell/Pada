@@ -17,8 +17,8 @@ namespace Pada.Infrastructure.Web.Extensions
             services.AddHttpContextAccessor();
             
             var appOptions = configuration.GetSection(appOptionSection).Get<AppOptions>();
-            services.AddOptions<AppOptions>().Bind(configuration.GetSection(appOptionSection))
-                .ValidateDataAnnotations();
+            services.AddOptions<AppOptions>().Bind(configuration.GetSection(appOptionSection));
+                // .ValidateDataAnnotations();
             
             services.AddControllers()
                 .ConfigureApplicationPartManager(manager =>

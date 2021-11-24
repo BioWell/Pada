@@ -31,7 +31,11 @@ namespace Pada.Infrastructure
             // 1. Controller MediatR & AutoMapper & MediatR Behaviors
             services.AddMediatR(assembliesArray);
             services.AddAutoMapper(assembliesArray);
-            services.AddFluentValidation(x => x.RegisterValidatorsFromAssemblies(assemblies));
+            services.AddFluentValidation(x =>
+            {
+                x.RegisterValidatorsFromAssemblies(assemblies);
+                x.AutomaticValidationEnabled = false;
+            });
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
             
