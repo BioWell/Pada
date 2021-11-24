@@ -1,14 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Pada.Infrastructure.Validations
 {
     public class AppValidationException : Exception
     {
-        public AppValidationException(ValidationResultModel validationResultModel)
+        public AppValidationException(List<string> errors)
         {
-            ValidationResultModel = validationResultModel;
+            Errors = errors;
         }
 
-        public ValidationResultModel ValidationResultModel { get; }
+        public List<string>  Errors { get; }
     }
 }

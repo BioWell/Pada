@@ -9,8 +9,10 @@ var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
 builder.ConfigureModules();
-var modules = ModuleLoader.LoadModules(ModuleLoader.LoadAssemblies(configuration));
-builder.AddModularInfrastructure(configuration, modules);
+var assemblies = ModuleLoader.LoadAssemblies(configuration);
+var modules = ModuleLoader.LoadModules(assemblies);
+
+builder.AddModularInfrastructure(configuration, modules, assemblies);
 AddCustomVersioning();
 builder.Build().UseModularInfrastructure(modules).Run();
 

@@ -1,19 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using FluentValidation;
+using FluentValidation.AspNetCore;
 using Hellang.Middleware.ProblemDetails;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Pada.Abstractions.Modules;
 using Pada.Infrastructure.Exceptions;
 using Pada.Infrastructure.Logging;
+using Pada.Infrastructure.Validations;
 using Pada.Infrastructure.Web.Extensions;
 
 namespace Pada.Infrastructure
@@ -22,14 +22,18 @@ namespace Pada.Infrastructure
     {
         public static WebApplicationBuilder AddModularInfrastructure(this WebApplicationBuilder builder,
             ConfigurationManager configuration,
-            IList<IModule> modules)
+            IList<IModule> modules,
+            IList<Assembly> assemblies)
         {
             var services = builder.Services;
+            var assembliesArray = assemblies.Cast<Assembly>().ToArray();
             
-            // 1. Controller MediatR & AutoMapper & Application layer
-            services.AddMediatR(Assembly.GetExecutingAssembly());
-            services.AddAutoMapper(Assembly.GetExecutingAssembly());
-            services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+            // 1. Controller MediatR & AutoMapper & MediatR Behaviors
+            services.AddMediatR(assembliesArray);
+            services.AddAutoMapper(assembliesArray);
+            services.AddFluentValidation(x => x.RegisterValidatorsFromAssemblies(assemblies));
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
             
             // 2. DbSet 
             //   Domain event & log
@@ -65,6 +69,7 @@ namespace Pada.Infrastructure
             // }
             // app.UseHttpsRedirection();
             
+            app.UseStaticFiles();
             app.UseProblemDetails();
             app.UseRouting();
             app.UseAuthentication();
@@ -88,9 +93,5 @@ namespace Pada.Infrastructure
             
             return app;
         }
-        
-        public static bool IsLocal(this IHostEnvironment hostEnvironment) =>
-            hostEnvironment?.IsEnvironment("local") ??
-            throw new ArgumentNullException(nameof(hostEnvironment));
     }
 }

@@ -28,8 +28,6 @@ namespace Pada.Modules.Identity.Api
 
         public void Register(IServiceCollection services)
         {
-            // For UsersMapping
-            services.AddAutoMapper(Assembly.GetExecutingAssembly());
             services.AddIdentityInfrastructure(Configuration);
             services.AddIdentityApplication();
         }

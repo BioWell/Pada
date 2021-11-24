@@ -39,7 +39,7 @@ namespace Pada.Infrastructure.Exceptions
                 {
                     Title = "input validation rules broken",
                     Status = StatusCodes.Status400BadRequest,
-                    Detail = JsonConvert.SerializeObject(ex.ValidationResultModel.Errors),
+                    Detail = JsonConvert.SerializeObject(ex.Errors),
                     Type = "https://pada/input-validation-rules-error",
                 });
                 x.Map<BadRequestException>(ex => new ProblemDetails()

@@ -77,7 +77,6 @@ namespace Pada.Modules.Identity.Infrastructure
             
             services.Configure<IdentityOptions>(configuration.GetSection(identitySectionName));
             
-            services.AddMediatR(Assembly.GetExecutingAssembly());
             return services;
         }
     }
