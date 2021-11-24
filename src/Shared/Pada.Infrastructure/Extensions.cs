@@ -7,25 +7,25 @@ using Hellang.Middleware.ProblemDetails;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Pada.Abstractions.Modules;
 using Pada.Infrastructure.Exceptions;
+using Pada.Infrastructure.Logging;
 using Pada.Infrastructure.Web.Extensions;
-using Pada.Infrastructure.Validations;
 
 namespace Pada.Infrastructure
 {
     public static class Extensions
     {
-        public static IServiceCollection AddModularInfrastructure(this IServiceCollection services,
+        public static WebApplicationBuilder AddModularInfrastructure(this WebApplicationBuilder builder,
             ConfigurationManager configuration,
             IList<IModule> modules)
         {
+            var services = builder.Services;
+            
             // 1. Controller MediatR & AutoMapper & Application layer
             services.AddMediatR(Assembly.GetExecutingAssembly());
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
@@ -50,7 +50,9 @@ namespace Pada.Infrastructure
                 x.Register(services);
             });
             
-            return services;
+            builder.Host.UseLogging();
+            
+            return builder;
         }
 
         public static WebApplication UseModularInfrastructure(this WebApplication app,

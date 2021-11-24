@@ -7,17 +7,16 @@ using Pada.Infrastructure.Modules;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
-var services = builder.Services;
 
 builder.ConfigureModules();
 var modules = ModuleLoader.LoadModules(ModuleLoader.LoadAssemblies(configuration));
-services.AddModularInfrastructure(configuration, modules);
+builder.AddModularInfrastructure(configuration, modules);
 AddCustomVersioning();
 builder.Build().UseModularInfrastructure(modules).Run();
 
 void AddCustomVersioning()
 {
-    services.AddApiVersioning(options =>
+    builder.Services.AddApiVersioning(options =>
     {
         options.ReportApiVersions = true;
         options.AssumeDefaultVersionWhenUnspecified = true;
