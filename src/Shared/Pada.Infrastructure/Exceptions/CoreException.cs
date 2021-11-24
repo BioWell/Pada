@@ -1,31 +1,17 @@
 ﻿using System;
+using System.Globalization;
 
 namespace Pada.Infrastructure.Exceptions
 {
-    public class CoreException : Exception
+    public class CoreException : ApplicationException
     {
-        public CoreException(string message) : base(message)
-        {
-        }
+        public CoreException() : base() { }
 
-        public static CoreException Exception(string message)
-        {
-            return new(message);
-        }
+        public CoreException(string message) : base(message) { }
 
-        public static CoreException NullArgument(string arg)
+        public CoreException(string message, params object[] args)
+            : base(String.Format(CultureInfo.CurrentCulture, message, args))
         {
-            return new($"{arg} cannot be null");
-        }
-
-        public static CoreException InvalidArgument(string arg)
-        {
-            return new($"{arg} is invalid");
-        }
-
-        public static CoreException NotFound(string arg)
-        {
-            return new($"{arg} was not found");
         }
     }
 }

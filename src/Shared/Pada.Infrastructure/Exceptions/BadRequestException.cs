@@ -6,7 +6,6 @@ namespace Pada.Infrastructure.Exceptions
     {
         public BadRequestException(string message) : base(message)
         {
-
         }
     }
 }

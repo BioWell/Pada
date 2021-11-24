@@ -38,6 +38,7 @@
 
     <ItemGroup>
       <Folder Include="Domain\Types" />
+      <Folder Include="Messaging\Events" />
     </ItemGroup>
 
 </Project>

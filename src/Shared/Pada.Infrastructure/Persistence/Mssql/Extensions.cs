@@ -15,7 +15,7 @@ namespace Pada.Infrastructure.Persistence.Mssql
         {
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             
-            if (string.IsNullOrWhiteSpace(connection)) throw CoreException.NullArgument(connection);
+            if (string.IsNullOrWhiteSpace(connection)) throw new CoreException($"{connection} cannot be null");
 
             services.AddDbContext<TContext>(options =>
                 {

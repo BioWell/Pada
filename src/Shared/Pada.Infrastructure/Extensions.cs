@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Ardalis.GuardClauses;
 using FluentValidation;
 using Hellang.Middleware.ProblemDetails;
 using MediatR;
@@ -14,7 +13,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Pada.Abstractions.Exceptions;
 using Pada.Abstractions.Modules;
 using Pada.Infrastructure.Exceptions;
 using Pada.Infrastructure.Web.Extensions;
@@ -43,50 +41,7 @@ namespace Pada.Infrastructure
             // services.AddSwaggerGen();
             
             // 4. Register Exceptions services
-            services.AddSingleton<IExceptionToResponseMapper, ExceptionToResponseMapper>()
-                .AddSingleton<IExceptionToMessageMapper, ExceptionToMessageMapper>()
-                .AddSingleton<IExceptionCompositionRoot, ExceptionCompositionRoot>()
-                .AddSingleton<IExceptionToMessageMapperResolver, ExceptionToMessageMapperResolver>();
-
-            services.AddProblemDetails(x =>
-            {
-                // Control when an exception is included
-                x.IncludeExceptionDetails = (ctx, _) =>
-                {
-                    var env = ctx.RequestServices.GetRequiredService<IHostEnvironment>();
-                    return false;//env.IsDevelopment() || env.IsStaging() || env.IsLocal();
-                };
-
-                x.Map<AppException>(ex => new ApplicationExceptionProblemDetail(ex));
-                x.Map<AppValidationException>(ex => new ProblemDetails
-                {
-                    Title = "input validation rules broken",
-                    Status = StatusCodes.Status400BadRequest,
-                    Detail = JsonConvert.SerializeObject(ex.ValidationResultModel.Errors),
-                    Type = "https://somedomain/input-validation-rules-error",
-                } );
-                x.Map<BadRequestException>(ex => new ProblemDetails()
-                {
-                    Title = "bad request exception",
-                    Status = StatusCodes.Status400BadRequest,
-                    Detail = ex.Message,
-                    Type = "https://somedomain/bad-request-error",
-                });
-                x.Map<NotFoundException>(ex => new ProblemDetails()
-                {
-                    Title = "not found exception",
-                    Status = StatusCodes.Status404NotFound,
-                    Detail = ex.Message,
-                    Type = "https://somedomain/not-found-error",
-                });
-                x.Map<ApiException>(ex => new ProblemDetails()
-                {
-                    Title = "api server exception",
-                    Status = StatusCodes.Status500InternalServerError,
-                    Detail = ex.Message,
-                    Type = "https://somedomain/api-server-error",
-                });
-            });
+            services.AddCoreExcepitons();
 
             // 3. Register Module services
             modules.ToList().ForEach(x =>
