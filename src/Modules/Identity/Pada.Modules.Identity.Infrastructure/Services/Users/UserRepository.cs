@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using EasyCaching.Core;
 using Microsoft.AspNetCore.Identity;
 using Pada.Infrastructure.Caching;
 using Pada.Infrastructure.Types;
 using Pada.Modules.Identity.Application.Users.Contracts;
 using Pada.Modules.Identity.Application.Users.Dtos.GatewayResponses;
+using Pada.Modules.Identity.Application.Users.Dtos.UseCaseResponses;
 using Pada.Modules.Identity.Domain.Aggregates.Users;
 
 namespace Pada.Modules.Identity.Infrastructure.Services.Users
@@ -15,19 +17,22 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
     {
         private readonly CustomUserManager _userManager;
         private readonly IEasyCachingProvider _cachingProvider;
+        private readonly IMapper _mapper;
 
-        public UserRepository(CustomUserManager userManager, 
-            IEasyCachingProvider cachingProvider)
+        public UserRepository(CustomUserManager userManager,
+            IEasyCachingProvider cachingProvider,
+            IMapper mapper)
         {
             _userManager = userManager;
             _cachingProvider = cachingProvider;
+            _mapper = mapper;
         }
 
         public async Task<User> FindByIdAsync(string id, bool invalidateCache = false)
         {
             if (invalidateCache)
                 await InvalidateCache(CacheKey.With(nameof(FindByIdAsync), id));
-            
+
             var appUser = await _userManager.FindByIdAsync(id);
             return appUser?.ToUser();
         }
@@ -37,7 +42,7 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
             var appUser = await _userManager.FindByEmailAsync(email);
             return appUser?.ToUser();
         }
-        
+
         public async Task<User> FindByNameAsync(string userName, bool invalidateCache = false)
         {
             var appUser = await _userManager.FindByNameAsync(userName);
@@ -48,7 +53,7 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
         {
             if (user is null)
                 return new CreateUserResponse(new Error[]
-                    { new("user_not_found", $"user can't be null") });
+                    {new("user_not_found", $"user can't be null")});
 
             var appUser = user.ToApplicationUser();
 
@@ -61,20 +66,20 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
             return new CreateUserResponse(Guid.Parse(appUser.Id), identityResult.Succeeded,
                 identityResult.Errors.Select(e => new Error(e.Code, e.Description)));
         }
-        
+
         public async Task<UpdateUserResponse> UpdateAsync(User user)
         {
             if (user is null)
                 return new UpdateUserResponse(new Error[]
-                    { new("user_not_found", $"user can't be null") });
+                    {new("user_not_found", $"user can't be null")});
 
             var appUser = user.ToApplicationUser();
             IdentityResult identityResult = await _userManager.UpdateAsync(appUser);
 
-            return new UpdateUserResponse(appUser.ToUser(), identityResult.Succeeded,
+            return new UpdateUserResponse(_mapper.Map<UserDto>(appUser.ToUser()), identityResult.Succeeded,
                 identityResult.Errors.Select(e => new Error(e.Code, e.Description)));
         }
-        
+
         private async Task InvalidateCache(string key)
         {
             await _cachingProvider.RemoveAsync(key);

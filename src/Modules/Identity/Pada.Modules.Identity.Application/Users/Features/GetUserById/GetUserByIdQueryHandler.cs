@@ -4,7 +4,6 @@ using Ardalis.GuardClauses;
 using AutoMapper;
 using MediatR;
 using Pada.Modules.Identity.Application.Users.Contracts;
-using Pada.Modules.Identity.Application.Users.Dtos;
 using Pada.Modules.Identity.Application.Users.Dtos.UseCaseResponses;
 using Pada.Modules.Identity.Application.Users.Exceptions;
 
