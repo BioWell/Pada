@@ -10,4 +10,28 @@
       <ProjectReference Include="..\Pada.Modules.Identity.Domain\Pada.Modules.Identity.Domain.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Users\Features\ChangeEmail" />
+      <Folder Include="Users\Features\ChangePersonalInformation" />
+      <Folder Include="Users\Features\ChangeStatus" />
+      <Folder Include="Users\Features\ChangeUserName" />
+      <Folder Include="Users\Features\ChangeUserPassword" />
+      <Folder Include="Users\Features\ChangeUserType" />
+      <Folder Include="Users\Features\GetCurrentUser" />
+      <Folder Include="Users\Features\GetUserByEmail" />
+      <Folder Include="Users\Features\GetUserByLogin" />
+      <Folder Include="Users\Features\GetUserByName" />
+      <Folder Include="Users\Features\GetUserInfo" />
+      <Folder Include="Users\Features\Lock\LockUser" />
+      <Folder Include="Users\Features\Lock\UnlockUser" />
+      <Folder Include="Users\Features\Mark\MarkAsAdmin" />
+      <Folder Include="Users\Features\Mark\MarkAsUser" />
+      <Folder Include="Users\Features\Mark\UpdatePermissions" />
+      <Folder Include="Users\Features\Password\ResetPassword" />
+      <Folder Include="Users\Features\Password\SendForgotPassword" />
+      <Folder Include="Users\Features\SendVerificationEmail" />
+      <Folder Include="Users\Features\UpdateRoles" />
+      <Folder Include="Users\Features\VerifyEmail" />
+    </ItemGroup>
+
 </Project>

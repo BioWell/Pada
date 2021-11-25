@@ -28,7 +28,7 @@ namespace Pada.Modules.Identity.Api
 
         public void Register(IServiceCollection services)
         {
-            services.AddIdentityInfrastructure(Configuration);
+            services.AddIdentityInfrastructure(Configuration, Name);
             services.AddIdentityApplication();
         }
 

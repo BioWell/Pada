@@ -16,14 +16,16 @@ namespace Pada.Modules.Identity.Application.Users.Features.RegisterNewUser
         private readonly IUserRepository _userRepository;
         private readonly ILogger<RegisterNewUserCommandHandler> _logger;
         private readonly IAppIdentityDbContext _identityDbContext;
-
+        private readonly RegistrationOptions _registrationOptions;
         public RegisterNewUserCommandHandler(IUserRepository userRepository,
             ILogger<RegisterNewUserCommandHandler> logger,
-            IAppIdentityDbContext identityDbContext)
+            IAppIdentityDbContext identityDbContext, 
+            RegistrationOptions registrationOptions)
         {
             _userRepository = userRepository;
             _logger = logger;
             _identityDbContext = identityDbContext;
+            _registrationOptions = registrationOptions;
         }
 
         public async Task<Unit> Handle(RegisterNewUserCommand command,
@@ -31,6 +33,18 @@ namespace Pada.Modules.Identity.Application.Users.Features.RegisterNewUser
         {
             Guard.Against.Null(command, nameof(RegisterNewUserCommand));
             
+            if (!_registrationOptions.Enabled)
+            {
+                throw new IdentityException(string.Format("Disabled"));
+            }
+            
+            var email = command.Email.ToLowerInvariant();
+            var provider = email.Split("@").Last();
+            if (_registrationOptions.InvalidEmailProviders?.Any(x => provider.Contains(x)) is true)
+            {
+                throw new EmailInvalidException(command.Email);
+            }
+
             var user = await _userRepository.FindByEmailAsync(command.Email);
             if (user is { })
             {

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using Pada.Abstractions.Auth;
 using Pada.Abstractions.Domain.Types;
 using Pada.Infrastructure.Utils;
 
@@ -38,7 +39,7 @@ namespace Pada.Modules.Identity.Domain.Aggregates.Users
         public static AppPermission TryCreateFromClaim(Claim claim)
         {
             AppPermission result = null!;
-            if (claim.Type.EqualsInvariant("permission"))
+            if (claim.Type.EqualsInvariant(CustomClaimTypes.Permission))
             {
                 result = new(claim.Value);
                 if (result.Name.Contains(ScopeCharSeparator))

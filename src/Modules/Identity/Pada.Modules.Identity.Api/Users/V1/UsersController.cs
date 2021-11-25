@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Pada.Infrastructure.Web;
 using Pada.Modules.Identity.Api.Users.Models.Requests;
 using Pada.Modules.Identity.Application.Users.Dtos.UseCaseResponses;
+using Pada.Modules.Identity.Application.Users.Features.Activation;
 using Pada.Modules.Identity.Application.Users.Features.GetUserById;
 using Pada.Modules.Identity.Application.Users.Features.RegisterNewUser;
 
@@ -43,6 +44,24 @@ namespace Pada.Modules.Identity.Api.Users.V1
         {
             var result = await Mediator.Send(new GetUserByIdQuery(id));
 
+            return Ok(result);
+        }
+        
+        // Put api/v1/identity/users/active-user
+        [HttpPut("active-user")]
+        [AllowAnonymous]
+        public async Task<ActionResult> ActivateUsersync(ActivateUserCommand request)
+        {
+            var result = await Mediator.Send(new ActivateUserCommand(request.UserId));
+            return Ok(result);
+        }
+        
+        // Put api/v1/identity/users/deactive-user
+        [HttpPut("deactive-user")]
+        [AllowAnonymous]
+        public async Task<ActionResult> DeActivateUsersync(ActivateUserCommand request)
+        {
+            var result = await Mediator.Send(new DeActivateUserCommand(request.UserId));
             return Ok(result);
         }
     }

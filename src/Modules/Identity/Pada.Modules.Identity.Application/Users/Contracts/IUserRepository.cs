@@ -10,5 +10,6 @@ namespace Pada.Modules.Identity.Application.Users.Contracts
         Task<User> FindByEmailAsync(string email, bool invalidateCache = false);
         Task<User> FindByNameAsync(string userName, bool invalidateCache = false);
         Task<CreateUserResponse> AddAsync(User user);
+        Task<UpdateUserResponse> UpdateAsync(User user);
     }
 }

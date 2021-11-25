@@ -62,6 +62,19 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
                 identityResult.Errors.Select(e => new Error(e.Code, e.Description)));
         }
         
+        public async Task<UpdateUserResponse> UpdateAsync(User user)
+        {
+            if (user is null)
+                return new UpdateUserResponse(new Error[]
+                    { new("user_not_found", $"user can't be null") });
+
+            var appUser = user.ToApplicationUser();
+            IdentityResult identityResult = await _userManager.UpdateAsync(appUser);
+
+            return new UpdateUserResponse(appUser.ToUser(), identityResult.Succeeded,
+                identityResult.Errors.Select(e => new Error(e.Code, e.Description)));
+        }
+        
         private async Task InvalidateCache(string key)
         {
             await _cachingProvider.RemoveAsync(key);

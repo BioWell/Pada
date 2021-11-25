@@ -1,7 +1,7 @@
 ﻿using System;
-using FluentValidation.Results;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Pada.Infrastructure.Validations;
 
 namespace Pada.Infrastructure.Utils
 {
@@ -24,6 +24,20 @@ namespace Pada.Infrastructure.Utils
             return type.Namespace.Contains(namespacePart)
                 ? type.Namespace.Split(".")[splitIndex].ToLowerInvariant()
                 : string.Empty;
+        }
+        
+        public static T GetOptions<T>(this IServiceCollection services, string sectionName) where T : new()
+        {
+            using var serviceProvider = services.BuildServiceProvider();
+            var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+            return configuration.GetOptions<T>(sectionName);
+        }
+
+        public static T GetOptions<T>(this IConfiguration configuration, string sectionName) where T : new()
+        {
+            var options = new T();
+            configuration.GetSection(sectionName).Bind(options);
+            return options;
         }
     }
 }

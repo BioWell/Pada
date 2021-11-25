@@ -8,8 +8,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Pada.Abstractions.Persistence.Mssql;
 using Pada.Infrastructure.Persistence.Mssql;
+using Pada.Infrastructure.Utils;
 using Pada.Modules.Identity.Application;
 using Pada.Modules.Identity.Application.Users.Contracts;
+using Pada.Modules.Identity.Application.Users.Features.RegisterNewUser;
 using Pada.Modules.Identity.Infrastructure.Aggregates.Roles;
 using Pada.Modules.Identity.Infrastructure.Aggregates.Users;
 using Pada.Modules.Identity.Infrastructure.Persistence;
@@ -26,11 +28,16 @@ namespace Pada.Modules.Identity.Infrastructure
 
         public static IServiceCollection AddIdentityInfrastructure(this IServiceCollection services,
             ConfigurationManager configuration,
+            string moduleName,
             string mssqlSectionName = MssqlSectionName,
             string identitySectionName = IdentitySectionName)
         {
             if (string.IsNullOrWhiteSpace(mssqlSectionName))
                 mssqlSectionName = MssqlSectionName;
+            
+            var registrationOptions =
+                services.GetOptions<RegistrationOptions>($"{moduleName}:" + nameof(RegistrationOptions));
+            services.AddSingleton(registrationOptions);
 
             services.Configure<MssqlOptions>(configuration.GetSection(mssqlSectionName));
             var mssqlOptions = configuration.GetSection(mssqlSectionName).Get<MssqlOptions>();

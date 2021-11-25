@@ -3,6 +3,14 @@
     "module": {
       "name": "identity",
       "enabled": true
+    },
+    "RegistrationOptions": {
+      "enabled": true,
+      "invalidEmailProviders": [
+        "discard",
+        "dispostable",
+        "mailinator"
+      ]
     }
   }
 }

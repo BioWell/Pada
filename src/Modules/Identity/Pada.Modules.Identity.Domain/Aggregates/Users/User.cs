@@ -151,5 +151,15 @@ namespace Pada.Modules.Identity.Domain.Aggregates.Users
                 return;
             _refreshTokens = refreshTokens.ToList();
         }
+        
+        public void ActivateUser()
+        {
+            IsActive = true;
+        }
+        
+        public void DeactivateUser()
+        {
+            IsActive = false;
+        }
     }
 }
