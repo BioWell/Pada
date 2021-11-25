@@ -7,7 +7,7 @@ using Pada.Infrastructure.Web;
 using Pada.Modules.Identity.Api.Users.Models.Requests;
 using Pada.Modules.Identity.Application.Users.Dtos.UseCaseResponses;
 using Pada.Modules.Identity.Application.Users.Features.Activation;
-using Pada.Modules.Identity.Application.Users.Features.GetUserById;
+using Pada.Modules.Identity.Application.Users.Features.GetUser;
 using Pada.Modules.Identity.Application.Users.Features.RegisterNewUser;
 
 namespace Pada.Modules.Identity.Api.Users.V1
@@ -47,6 +47,26 @@ namespace Pada.Modules.Identity.Api.Users.V1
             return Ok(result);
         }
         
+        // GET api/v1/identity/users/email/{email}
+        [HttpGet("email/{email}", Name = nameof(GetUserByEmailAsync))]
+        [AllowAnonymous]
+        public async Task<ActionResult<UserDto>> GetUserByEmailAsync([FromRoute] string email)
+        {
+            var result = await Mediator.Send(new GetUserByEmailQuery(email));
+
+            return Ok(result);
+        }
+        
+        // GET api/v1/identity/users/UserName/{UserName}
+        [HttpGet("UserName/{UserName}", Name = nameof(GetUserByNameAsync))]
+        [AllowAnonymous]
+        public async Task<ActionResult<UserDto>> GetUserByNameAsync([FromRoute] string UserName)
+        {
+            var result = await Mediator.Send(new GetUserByUserNameQuery(UserName));
+
+            return Ok(result);
+        }
+
         // Put api/v1/identity/users/active-user
         [HttpPut("active-user")]
         [AllowAnonymous]

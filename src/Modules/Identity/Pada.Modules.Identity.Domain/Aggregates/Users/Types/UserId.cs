@@ -3,7 +3,7 @@ using Pada.Abstractions.Domain.Types;
 
 namespace Pada.Modules.Identity.Domain.Aggregates.Users.Types
 {
-    public class UserId : IdentityBase<Guid>
+    public class UserId : EntityBase
     {
         public UserId(Guid value) : base(value)
         {

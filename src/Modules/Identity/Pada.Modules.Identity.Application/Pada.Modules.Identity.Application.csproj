@@ -18,9 +18,7 @@
       <Folder Include="Users\Features\ChangeUserPassword" />
       <Folder Include="Users\Features\ChangeUserType" />
       <Folder Include="Users\Features\GetCurrentUser" />
-      <Folder Include="Users\Features\GetUserByEmail" />
       <Folder Include="Users\Features\GetUserByLogin" />
-      <Folder Include="Users\Features\GetUserByName" />
       <Folder Include="Users\Features\GetUserInfo" />
       <Folder Include="Users\Features\Lock\LockUser" />
       <Folder Include="Users\Features\Lock\UnlockUser" />

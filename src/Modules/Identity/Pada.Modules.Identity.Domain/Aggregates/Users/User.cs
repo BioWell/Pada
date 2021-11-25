@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Ardalis.GuardClauses;
 using Pada.Abstractions.Auth;
 using Pada.Abstractions.Domain.Types;
-using Pada.Infrastructure.Utils;
 using Pada.Modules.Identity.Domain.Aggregates.Users.Types;
 
 namespace Pada.Modules.Identity.Domain.Aggregates.Users
 {
-    public class User : AggregateRoot<Guid, UserId>
+    public class User : AggregateRoot<Guid>
     {
         // Using a private collection field, better for DDD Aggregate's encapsulation
         private List<Role> _roles = new();

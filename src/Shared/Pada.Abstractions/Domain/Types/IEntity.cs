@@ -2,12 +2,12 @@
 
 namespace Pada.Abstractions.Domain.Types
 {
-    public interface IEntity<TId, out TIdentity> where TIdentity : IdentityBase<TId>
+    public interface IEntity<TId> 
     {
-        TIdentity Id { get; }
+        TId Id { get; }
     }
 
-    public interface IEntity : IEntity<Guid, IdentityBase<Guid>>
+    public interface IEntity : IEntity<Guid>
     {
     }
 }

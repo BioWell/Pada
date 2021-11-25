@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-using MediatR;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -8,8 +6,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Pada.Abstractions.Modules;
 using Pada.Modules.Identity.Application;
-using Pada.Modules.Identity.Application.Users.Features.GetUserById;
-using Pada.Modules.Identity.Application.Users.Features.RegisterNewUser;
 using Pada.Modules.Identity.Infrastructure;
 
 namespace Pada.Modules.Identity.Api

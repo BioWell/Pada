@@ -32,19 +32,22 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
         {
             if (invalidateCache)
                 await InvalidateCache(CacheKey.With(nameof(FindByIdAsync), id));
-
             var appUser = await _userManager.FindByIdAsync(id);
             return appUser?.ToUser();
         }
 
         public async Task<User> FindByEmailAsync(string email, bool invalidateCache = false)
         {
+            if (invalidateCache)
+                await InvalidateCache(CacheKey.With(nameof(FindByEmailAsync), email));
             var appUser = await _userManager.FindByEmailAsync(email);
             return appUser?.ToUser();
         }
 
         public async Task<User> FindByNameAsync(string userName, bool invalidateCache = false)
         {
+            if (invalidateCache)
+                await InvalidateCache(CacheKey.With(nameof(FindByNameAsync), userName));
             var appUser = await _userManager.FindByNameAsync(userName);
             return appUser?.ToUser();
         }

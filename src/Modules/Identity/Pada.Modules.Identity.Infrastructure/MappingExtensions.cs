@@ -42,7 +42,7 @@ namespace Pada.Modules.Identity.Infrastructure
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Email = user.Email,
-                Id = user.Id.Id.ToString(),
+                Id = user.Id.ToString(),
                 Permissions = user.Permissions.ToList(),
                 Roles = user.Roles.Select(x => x.ToApplicationRole()).ToList(),
                 EmailConfirmed = user.EmailConfirmed,

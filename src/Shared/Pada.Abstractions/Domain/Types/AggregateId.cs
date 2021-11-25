@@ -2,7 +2,7 @@
 
 namespace Pada.Abstractions.Domain.Types
 {
-    public class AggregateId<T> : IdentityBase<T>
+    public class AggregateId<T> : EntityBase<T>
     {
         public AggregateId(T id) : base(id)
         {

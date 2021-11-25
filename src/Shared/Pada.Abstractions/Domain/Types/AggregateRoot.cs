@@ -2,19 +2,18 @@
 
 namespace Pada.Abstractions.Domain.Types
 {
-    public abstract class AggregateRoot<TId, TIdentity> : EntityBase<TId, TIdentity>, IAggregateRoot
-        where TIdentity : IdentityBase<TId>
+    public abstract class AggregateRoot<TId> : EntityBase<TId>, IAggregateRoot
     {
         protected AggregateRoot()
         {
         }
 
-        protected AggregateRoot(TIdentity id) : base(id)
+        protected AggregateRoot(TId id) : base(id)
         {
         }
     }
     
-    public abstract class AggregateRoot : AggregateRoot<Guid, AggregateId>
+    public abstract class AggregateRoot : AggregateRoot<Guid>
     {
         protected AggregateRoot()
         {

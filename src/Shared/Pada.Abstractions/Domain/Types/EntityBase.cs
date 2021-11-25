@@ -3,26 +3,24 @@ using System.Collections.Generic;
 
 namespace Pada.Abstractions.Domain.Types
 {
-    public abstract class EntityBase<TId, TIdentity> : IEntity<TId, TIdentity>, 
-        IEquatable<EntityBase<TId, TIdentity>>
-        where TIdentity : IdentityBase<TId>
+    public abstract class EntityBase<TId> : IEntity<TId>
     {
-        public TIdentity Id { get; protected set; }
+        public TId Id { get; protected set; }
+        public DateTime Created { get; protected set; } = DateTime.Now;
+        public DateTime? Updated { get; protected set; }
 
         protected EntityBase()
         {
         }
-        
-        protected EntityBase(TIdentity id) => Id = id;
 
-        public DateTime Created { get; protected set; } = DateTime.Now;
-        public DateTime? Updated { get; protected set; }
+        protected EntityBase(TId id) => Id = id;
 
-        public bool Equals(EntityBase<TId, TIdentity> other)
+        public bool Equals(EntityBase<TId> other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return EqualityComparer<TIdentity>.Default.Equals(Id, other.Id) && Created.Equals(other.Created) &&
+            return EqualityComparer<TId>.Default.Equals(Id, other.Id) &&
+                   Created.Equals(other.Created) &&
                    Nullable.Equals(Updated, other.Updated);
         }
 
@@ -31,31 +29,16 @@ namespace Pada.Abstractions.Domain.Types
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((EntityBase<TId, TIdentity>) obj);
+            return Equals((EntityBase<TId>) obj);
         }
 
         public override int GetHashCode() => HashCode.Combine(Id, Created, Updated);
-
         public override string ToString() => $"{GetType().Name}#[Identity={Id}]";
-
-        public static bool operator ==(EntityBase<TId, TIdentity> a, EntityBase<TId, TIdentity> b)
-        {
-            if (ReferenceEquals(a, null) && ReferenceEquals(b, null))
-                return true;
-
-            if (ReferenceEquals(a, null) || ReferenceEquals(b, null))
-                return false;
-
-            return a.Equals(b);
-        }
-
-        public static bool operator !=(EntityBase<TId, TIdentity> a, EntityBase<TId, TIdentity> b) 
-            => !(a == b);
     }
 
-    public abstract class EntityBase : EntityBase<Guid, IdentityBase<Guid>>
+    public abstract class EntityBase : EntityBase<Guid>
     {
-        protected EntityBase(IdentityBase<Guid> id) : base(id)
+        protected EntityBase(Guid id) : base(id)
         {
         }
     }
