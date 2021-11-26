@@ -6,11 +6,12 @@ namespace Pada.Abstractions.Domain.Types
     public abstract class EntityBase<TId> : IEntity<TId>
     {
         public TId Id { get; protected set; }
-        public DateTime Created { get; protected set; } = DateTime.Now;
+        public DateTime? Created { get; protected set; }
         public DateTime? Updated { get; protected set; }
 
         protected EntityBase()
         {
+            Created = DateTime.Now;
         }
 
         protected EntityBase(TId id) => Id = id;

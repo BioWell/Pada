@@ -51,11 +51,13 @@ namespace Pada.Modules.Identity.Application.Users.Features.Activation
             }
 
             user.DeactivateUser();
-            var response =  await _userRepository.UpdateAsync(user);
-
+            var result =  await _userRepository.UpdateAsync(user);
+            if (result.IsSuccess == false)
+                throw result.ToAppException();
+            
             _logger.LogInformation($"user with id '{user.Id}' deactivated successfully.");
 
-            return  response;
+            return  result;
         }
     }
 }

@@ -81,5 +81,15 @@ namespace Pada.Modules.Identity.Infrastructure
                 Permissions = role.Permissions
             };
         }
+
+        public static UserId ToUserId(this AppUser appUser)
+        {
+            if (appUser is null)
+                return null;
+            var userId = new UserId(Guid.Parse(appUser.Id),
+                appUser.CreatedDate,
+                appUser.ModifiedDate);
+            return userId;
+        }
     }
 }

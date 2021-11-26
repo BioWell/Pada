@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using Pada.Infrastructure.Types;
-using Pada.Modules.Identity.Application.Users.Dtos.UseCaseResponses;
+using Pada.Modules.Identity.Domain.Aggregates.Users.Types;
 
 namespace Pada.Modules.Identity.Application.Users.Dtos.GatewayResponses
 {
-    public class UpdateUserResponse : GatewayResponse<UserDto>
+    public class UpdateUserResponse : GatewayResponse<UserId>
     {
-        public UpdateUserResponse(UserDto data, bool isSuccess = true, IEnumerable<Error> errors = default)
+        public UpdateUserResponse(UserId data, bool isSuccess = true, IEnumerable<Error> errors = default)
             : base(data, isSuccess, errors)
         {
         }

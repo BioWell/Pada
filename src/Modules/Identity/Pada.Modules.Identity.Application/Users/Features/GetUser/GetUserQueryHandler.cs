@@ -3,26 +3,30 @@ using System.Threading.Tasks;
 using Ardalis.GuardClauses;
 using AutoMapper;
 using MediatR;
+using Microsoft.Extensions.Logging;
 using Pada.Modules.Identity.Application.Users.Contracts;
+using Pada.Modules.Identity.Application.Users.Dtos.GatewayResponses;
 using Pada.Modules.Identity.Application.Users.Dtos.UseCaseResponses;
 using Pada.Modules.Identity.Application.Users.Exceptions;
 
 namespace Pada.Modules.Identity.Application.Users.Features.GetUser
 {
-    public class GetUserQueryHandler: IRequestHandler<GetUserByIdQuery, UserDto>,
-        IRequestHandler<GetUserByEmailQuery, UserDto>,
-        IRequestHandler<GetUserByUserNameQuery, UserDto>
+    public class GetUserQueryHandler: IRequestHandler<GetUserByIdQuery, GetUserResponse>,
+        IRequestHandler<GetUserByEmailQuery, GetUserResponse>,
+        IRequestHandler<GetUserByUserNameQuery, GetUserResponse>
     {
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
+        private readonly ILogger<GetUserQueryHandler> _logger;
 
-        public GetUserQueryHandler(IUserRepository userRepository, IMapper mapper)
+        public GetUserQueryHandler(IUserRepository userRepository, IMapper mapper, ILogger<GetUserQueryHandler> logger)
         {
             _userRepository = userRepository;
             _mapper = mapper;
+            _logger = logger;
         }
 
-        public async Task<UserDto> Handle(GetUserByIdQuery query, CancellationToken cancellationToken = default)
+        public async Task<GetUserResponse> Handle(GetUserByIdQuery query, CancellationToken cancellationToken = default)
         {
             Guard.Against.Null(query, nameof(GetUserByIdQuery));
 
@@ -30,10 +34,11 @@ namespace Pada.Modules.Identity.Application.Users.Features.GetUser
             if (user == null)
                 throw new UserNotFoundException(query.UserId.ToString());
 
-            return _mapper.Map<UserDto>(user);
+            _logger.LogInformation($"Get user with id '{user.Id}' successfully.");
+            return new GetUserResponse(_mapper.Map<UserDto>(user));
         }
 
-        public async Task<UserDto> Handle(GetUserByEmailQuery query, CancellationToken cancellationToken)
+        public async Task<GetUserResponse> Handle(GetUserByEmailQuery query, CancellationToken cancellationToken)
         {
             Guard.Against.Null(query, nameof(GetUserByIdQuery));
 
@@ -41,10 +46,11 @@ namespace Pada.Modules.Identity.Application.Users.Features.GetUser
             if (user == null)
                 throw new UserNotFoundException(query.Email);
 
-            return _mapper.Map<UserDto>(user);
+            _logger.LogInformation($"Get user with Email '{user.Email}' successfully.");
+            return new GetUserResponse(_mapper.Map<UserDto>(user));
         }
 
-        public async Task<UserDto> Handle(GetUserByUserNameQuery query, CancellationToken cancellationToken)
+        public async Task<GetUserResponse> Handle(GetUserByUserNameQuery query, CancellationToken cancellationToken)
         {
             Guard.Against.Null(query, nameof(GetUserByUserNameQuery));
             
@@ -52,7 +58,8 @@ namespace Pada.Modules.Identity.Application.Users.Features.GetUser
             if (user == null)
                 throw new UserNotFoundException(query.UserName);
 
-            return _mapper.Map<UserDto>(user);
+            _logger.LogInformation($"Get user with UserName '{user.UserName}' successfully.");
+            return new GetUserResponse(_mapper.Map<UserDto>(user));
         }
     }
 }

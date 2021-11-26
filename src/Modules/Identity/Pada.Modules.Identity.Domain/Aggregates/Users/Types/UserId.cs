@@ -9,6 +9,12 @@ namespace Pada.Modules.Identity.Domain.Aggregates.Users.Types
         {
         }
         
+        public UserId(Guid id, DateTime created, DateTime updated) : base(id)
+        {
+            Created = created;
+            Updated = updated;
+        }
+
         public static implicit operator UserId(Guid id) => new(id);
 
         public static implicit operator Guid(UserId userId) => userId.Id;

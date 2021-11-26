@@ -29,7 +29,7 @@ namespace Pada.Modules.Identity.Domain.Aggregates.Users
         public bool PasswordExpired { get; private set; }
         public DateTime? LastPasswordChangedDate { get; private set; }
         public DateTime CreatedDate { get; private set; }
-        public DateTime? ModifiedDate { get; private set; }
+        public DateTime ModifiedDate { get; private set; }
         public string CreatedBy { get; private set; }
         public string ModifiedBy { get; private set; }
         public IReadOnlyList<Role> Roles => _roles.AsReadOnly();
@@ -54,7 +54,7 @@ namespace Pada.Modules.Identity.Domain.Aggregates.Users
             CreatedDate = createdDate ?? DateTime.Now;
             CreatedBy = createdBy;
             ModifiedBy = modifiedBy;
-            ModifiedDate = modifiedDate;
+            ModifiedDate = modifiedDate?? DateTime.Now;;
         }
 
         private User()

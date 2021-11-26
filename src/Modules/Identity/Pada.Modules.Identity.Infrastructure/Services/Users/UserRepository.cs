@@ -8,7 +8,6 @@ using Pada.Infrastructure.Caching;
 using Pada.Infrastructure.Types;
 using Pada.Modules.Identity.Application.Users.Contracts;
 using Pada.Modules.Identity.Application.Users.Dtos.GatewayResponses;
-using Pada.Modules.Identity.Application.Users.Dtos.UseCaseResponses;
 using Pada.Modules.Identity.Domain.Aggregates.Users;
 
 namespace Pada.Modules.Identity.Infrastructure.Services.Users
@@ -79,7 +78,7 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
             var appUser = user.ToApplicationUser();
             IdentityResult identityResult = await _userManager.UpdateAsync(appUser);
 
-            return new UpdateUserResponse(_mapper.Map<UserDto>(appUser.ToUser()), identityResult.Succeeded,
+            return new UpdateUserResponse(appUser.ToUserId(), identityResult.Succeeded,
                 identityResult.Errors.Select(e => new Error(e.Code, e.Description)));
         }
 
