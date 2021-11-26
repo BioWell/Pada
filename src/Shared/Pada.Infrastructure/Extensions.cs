@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using FluentValidation;
 using FluentValidation.AspNetCore;
-using Hellang.Middleware.ProblemDetails;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -76,7 +74,7 @@ namespace Pada.Infrastructure
             // app.UseHttpsRedirection();
             
             app.UseStaticFiles();
-            app.UseProblemDetails();
+            app.UseMiddleware<GlobalExceptionHandler>();
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();

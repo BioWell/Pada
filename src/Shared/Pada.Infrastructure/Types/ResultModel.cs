@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using Pada.Infrastructure.Exceptions;
 
 namespace Pada.Infrastructure.Types
 {
@@ -8,7 +6,7 @@ namespace Pada.Infrastructure.Types
     {
         public ResultModel(T data, bool success = true, IEnumerable<Error> errors = default!)
         {
-            Data = data;
+            Datas = data;
             IsSuccess = success;
             Errors = errors;
         }
@@ -34,14 +32,7 @@ namespace Pada.Infrastructure.Types
             return new ResultModel<T>(data);
         }
 
-        public AppException ToAppException()
-        {
-            var description = Errors.FirstOrDefault()?.Message;
-            var errorCode = Errors.FirstOrDefault()?.Code;
-            return new AppException(description, errorCode);
-        }
-
-        public T Data { get; }
+        public T Datas { get; }
         public bool IsSuccess { get; }
         public IEnumerable<Error> Errors { get; }
     }
@@ -73,13 +64,6 @@ namespace Pada.Infrastructure.Types
         public static ResultModel Success()
         {
             return new ResultModel(true);
-        }
-
-        public AppException ToAppException()
-        {
-            var description = Errors.FirstOrDefault()?.Message;
-            var errorCode = Errors.FirstOrDefault()?.Code;
-            return new AppException(description, errorCode);
         }
 
         public bool IsSuccess { get; }

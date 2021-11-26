@@ -1,12 +1,7 @@
-﻿using System;
-
-namespace Pada.Infrastructure.Exceptions
+﻿namespace Pada.Infrastructure.Exceptions
 {
-    public abstract class DomainException : Exception
+    public abstract class DomainException : CustomException
     {
-        public string Code { get; set; }
-        protected DomainException(string message) : base(message)
-        {
-        }
+        public DomainException(string message) : base(message) { }
     }
 }

@@ -1,14 +1,7 @@
-﻿using System;
-
-namespace Pada.Infrastructure.Exceptions
+﻿namespace Pada.Infrastructure.Exceptions
 {
-    public class AppException : Exception
+    public class AppException : CustomException
     {
-        public virtual string Code { get; }
-
-        public AppException(string message, string code = default!) : base(message)
-        {
-            Code = code;
-        }
+        public AppException(string message) : base(message) { }
     }
 }

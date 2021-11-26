@@ -3,7 +3,7 @@ using Pada.Infrastructure.Exceptions;
 
 namespace Pada.Modules.Identity.Application.Users.Exceptions
 {
-    public class UserNotFoundException : AppException
+    public class UserNotFoundException : NotFoundException
     {
         public Guid UserId { get; }
         public string UserNameOrEmail { get; }

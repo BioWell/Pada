@@ -1,12 +1,7 @@
-﻿using System;
-
-namespace Pada.Infrastructure.Exceptions
+﻿namespace Pada.Infrastructure.Exceptions
 {
-    public class NotFoundException : ApplicationException
+    public class NotFoundException : CustomException
     {
-        public NotFoundException(string name, object key)
-            : base($"{name} ({key}) is not found")
-        {
-        }
+        public NotFoundException(string message) : base(message) { }
     }
 }

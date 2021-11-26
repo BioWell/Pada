@@ -1,11 +1,7 @@
-﻿using System;
-
-namespace Pada.Infrastructure.Exceptions
+﻿namespace Pada.Infrastructure.Exceptions
 {
-    public class BadRequestException : ApplicationException
+    public class BadRequestException : CustomException
     {
-        public BadRequestException(string message) : base(message)
-        {
-        }
+        public BadRequestException(string message) : base(message) { }
     }
 }
