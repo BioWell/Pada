@@ -68,6 +68,7 @@ namespace Pada.Modules.Identity.Application.Users.Features.RegisterNewUser
                 command.PhoneNumber,
                 command.Password,
                 command.UserType,
+                true,
                 command.IsAdministrator,
                 command.IsActive,
                 command.EmailConfirmed,

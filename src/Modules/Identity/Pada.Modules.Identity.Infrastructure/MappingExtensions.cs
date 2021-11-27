@@ -19,11 +19,24 @@ namespace Pada.Modules.Identity.Infrastructure
             var permissions = appUser.Permissions;
             var roles = appUser.Roles?.Select(x => Role.Of(x.Name, x.Name)).ToArray();
             var refreshTokens = appUser.RefreshTokens;
-            var user = User.Create(new UserId(Guid.Parse(appUser.Id)), appUser.Email, appUser.FirstName,
+            var user = User.Create(new UserId(Guid.Parse(appUser.Id)),
+                appUser.Email,
+                appUser.FirstName,
                 appUser.LastName,
-                appUser.Name, appUser.UserName, appUser.PhoneNumber, null!,
-                userType, appUser.IsAdministrator, appUser.IsActive, appUser.EmailConfirmed,
-                appUser.PhotoUrl, appUser.Status,appUser.CreatedBy, appUser.CreatedDate, appUser.ModifiedBy,
+                appUser.Name, 
+                appUser.UserName, 
+                appUser.PhoneNumber, 
+                null!,
+                userType, 
+                appUser.LockoutEnabled,
+                appUser.IsAdministrator, 
+                appUser.IsActive, 
+                appUser.EmailConfirmed,
+                appUser.PhotoUrl, 
+                appUser.Status,
+                appUser.CreatedBy, 
+                appUser.CreatedDate, 
+                appUser.ModifiedBy,
                 appUser.ModifiedDate);
             user.ChangePermissions(permissions);
             user.ChangeRoles(roles);

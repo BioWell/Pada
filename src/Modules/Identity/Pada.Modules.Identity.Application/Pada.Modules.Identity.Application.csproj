@@ -20,8 +20,6 @@
       <Folder Include="Users\Features\GetCurrentUser" />
       <Folder Include="Users\Features\GetUserByLogin" />
       <Folder Include="Users\Features\GetUserInfo" />
-      <Folder Include="Users\Features\Lock\LockUser" />
-      <Folder Include="Users\Features\Lock\UnlockUser" />
       <Folder Include="Users\Features\Mark\MarkAsAdmin" />
       <Folder Include="Users\Features\Mark\MarkAsUser" />
       <Folder Include="Users\Features\Mark\UpdatePermissions" />

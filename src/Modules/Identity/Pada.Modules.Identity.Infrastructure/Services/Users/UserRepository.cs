@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using EasyCaching.Core;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using Pada.Infrastructure.Caching;
 using Pada.Modules.Identity.Application.Users.Contracts;
 using Pada.Modules.Identity.Application.Users.Dtos.GatewayResponses;
@@ -17,14 +18,17 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
         private readonly CustomUserManager _userManager;
         private readonly IEasyCachingProvider _cachingProvider;
         private readonly IMapper _mapper;
+        private readonly IdentityOptions _identityOptionsValue;
 
         public UserRepository(CustomUserManager userManager,
             IEasyCachingProvider cachingProvider,
-            IMapper mapper)
+            IMapper mapper, 
+            IOptions<IdentityOptions> identityOptions)
         {
             _userManager = userManager;
             _cachingProvider = cachingProvider;
             _mapper = mapper;
+            _identityOptionsValue = identityOptions.Value;
         }
 
         public async Task<User> FindByIdAsync(string id, bool invalidateCache = false)
@@ -80,9 +84,31 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
             IdentityResult identityResult = await _userManager.UpdateAsync(appUser);
 
             if (identityResult.Succeeded) 
-                InvalidateUserCache(appUser);
+                await InvalidateUserCache(appUser);
             
             return new UpdateUserResponse(appUser.ToUserId(),
+                identityResult.Succeeded,
+                identityResult.Errors
+                    .Distinct()
+                    .ToDictionary(x => x.Code, x => new string[] {x.Description}));
+        }
+
+        public async Task<LockUserResponse> LockUserAsync(string userId)
+        {
+            var appUser = await _userManager.FindByIdAsync(userId);
+
+            if (appUser is null)
+                return new LockUserResponse("user_not_found", $"User not found for userId: `{userId}`");
+            
+            if (appUser.LockoutEnabled == false)
+                return new LockUserResponse("LockoutEnabled", $"LockoutEnabled is : `{appUser.LockoutEnabled}`");
+            
+            var duration = _identityOptionsValue?.Lockout?.DefaultLockoutTimeSpan ?? TimeSpan.FromMinutes(15);
+            
+            var identityResult = await _userManager.SetLockoutEndDateAsync(appUser,
+                DateTimeOffset.Now + duration);
+
+            return new LockUserResponse(appUser.ToUserId(),
                 identityResult.Succeeded,
                 identityResult.Errors
                     .Distinct()

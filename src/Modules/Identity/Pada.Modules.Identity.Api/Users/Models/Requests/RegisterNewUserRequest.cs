@@ -19,7 +19,7 @@ namespace Pada.Modules.Identity.Api.Users.Models.Requests
         public UserType UserType { get; set; }
         public string Status { get; set; }
         public string Password { get; set; }
-        public bool LockoutEnabled { get; set; }
+        public bool LockoutEnabled { get; set; } = true;
         public bool IsActive { get; set; }
         public IEnumerable<string> Roles { get; set; }
         public IEnumerable<string> Permissions { get; set; }

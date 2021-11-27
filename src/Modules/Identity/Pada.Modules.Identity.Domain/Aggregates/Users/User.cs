@@ -27,6 +27,7 @@ namespace Pada.Modules.Identity.Domain.Aggregates.Users
         public string PhoneNumber { get; private set; }
         public bool IsActive { get; private set; }
         public bool PasswordExpired { get; private set; }
+        public bool LockoutEnabled { get; private set; }
         public DateTime? LastPasswordChangedDate { get; private set; }
         public DateTime CreatedDate { get; private set; }
         public DateTime ModifiedDate { get; private set; }
@@ -38,6 +39,7 @@ namespace Pada.Modules.Identity.Domain.Aggregates.Users
 
         private User(UserId id,
             string password,
+            bool isLockoutEnabled,
             bool isAdmin = false,
             bool isActive = true,
             bool emailConfirmed = false,
@@ -48,6 +50,7 @@ namespace Pada.Modules.Identity.Domain.Aggregates.Users
         {
             Id = id;
             Password = password;
+            LockoutEnabled = isLockoutEnabled;
             EmailConfirmed = emailConfirmed;
             IsAdministrator = isAdmin;
             IsActive = isActive;
@@ -71,6 +74,7 @@ namespace Pada.Modules.Identity.Domain.Aggregates.Users
             string phoneNumber,
             string password,
             UserType userType,
+            bool isLockoutEnabled,
             bool isAdmin = false,
             bool isActive = true,
             bool emailConfirmed = false,
@@ -83,6 +87,7 @@ namespace Pada.Modules.Identity.Domain.Aggregates.Users
         {
             var user = new User(id,
                 password,
+                isLockoutEnabled,
                 isAdmin,
                 isActive,
                 emailConfirmed,
