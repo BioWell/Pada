@@ -28,9 +28,7 @@ namespace Pada.Modules.Identity.Application.Users.Features.Activation
 
             var user = await _userRepository.FindByIdAsync(command.UserId);
             if (user == null)
-            {
                 throw new UserNotFoundException(command.UserId);
-            }
 
             user.ActivateUser();
             var response =  await _userRepository.UpdateAsync(user);
@@ -46,14 +44,10 @@ namespace Pada.Modules.Identity.Application.Users.Features.Activation
 
             var user = await _userRepository.FindByIdAsync(command.UserId);
             if (user == null)
-            {
                 throw new UserNotFoundException(command.UserId);
-            }
 
             user.DeactivateUser();
             var result =  await _userRepository.UpdateAsync(user);
-            // if (result.IsSuccess == false)
-            //     throw result.ToAppException();
             
             _logger.LogInformation($"user with id '{user.Id}' deactivated successfully.");
 

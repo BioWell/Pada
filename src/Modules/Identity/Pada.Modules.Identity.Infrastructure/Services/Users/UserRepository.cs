@@ -5,10 +5,10 @@ using AutoMapper;
 using EasyCaching.Core;
 using Microsoft.AspNetCore.Identity;
 using Pada.Infrastructure.Caching;
-using Pada.Infrastructure.Types;
 using Pada.Modules.Identity.Application.Users.Contracts;
 using Pada.Modules.Identity.Application.Users.Dtos.GatewayResponses;
 using Pada.Modules.Identity.Domain.Aggregates.Users;
+using Pada.Modules.Identity.Infrastructure.Aggregates.Users;
 
 namespace Pada.Modules.Identity.Infrastructure.Services.Users
 {
@@ -63,12 +63,12 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
                 identityResult = await _userManager.CreateAsync(appUser);
             else
                 identityResult = await _userManager.CreateAsync(appUser, user.Password);
-            
+
             return new CreateUserResponse(Guid.Parse(appUser.Id),
                 identityResult.Succeeded,
                 identityResult.Errors
                     .Distinct()
-                    .ToDictionary(x => x.Code, x => new string[]{ x.Description}));
+                    .ToDictionary(x => x.Code, x => new string[] {x.Description}));
         }
 
         public async Task<UpdateUserResponse> UpdateAsync(User user)
@@ -79,16 +79,26 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
             var appUser = user.ToApplicationUser();
             IdentityResult identityResult = await _userManager.UpdateAsync(appUser);
 
+            if (identityResult.Succeeded) 
+                InvalidateUserCache(appUser);
+            
             return new UpdateUserResponse(appUser.ToUserId(),
                 identityResult.Succeeded,
                 identityResult.Errors
                     .Distinct()
-                    .ToDictionary(x => x.Code, x => new string[]{ x.Description}));
+                    .ToDictionary(x => x.Code, x => new string[] {x.Description}));
         }
 
         private async Task InvalidateCache(string key)
         {
             await _cachingProvider.RemoveAsync(key);
+        }
+
+        private async Task InvalidateUserCache(AppUser appUser)
+        {
+            await InvalidateCache(CacheKey.With(nameof(FindByIdAsync), Guid.Parse(appUser.Id).ToString()));
+            await InvalidateCache(CacheKey.With(nameof(FindByEmailAsync), appUser.Email));
+            await InvalidateCache(CacheKey.With(nameof(FindByNameAsync), appUser.UserName));
         }
     }
 }
