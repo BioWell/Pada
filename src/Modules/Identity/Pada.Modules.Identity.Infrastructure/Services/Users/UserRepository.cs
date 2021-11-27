@@ -54,7 +54,7 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
         public async Task<CreateUserResponse> AddAsync(User user)
         {
             if (user is null)
-                return new CreateUserResponse(new Error[]
+                return new CreateUserResponse(new BaseError[]
                     {new("user_not_found", $"user can't be null")});
 
             var appUser = user.ToApplicationUser();
@@ -66,20 +66,20 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
                 identityResult = await _userManager.CreateAsync(appUser, user.Password);
 
             return new CreateUserResponse(Guid.Parse(appUser.Id), identityResult.Succeeded,
-                identityResult.Errors.Select(e => new Error(e.Code, e.Description)));
+                identityResult.Errors.Select(e => new BaseError(e.Code, e.Description)));
         }
 
         public async Task<UpdateUserResponse> UpdateAsync(User user)
         {
             if (user is null)
-                return new UpdateUserResponse(new Error[]
+                return new UpdateUserResponse(new BaseError[]
                     {new("user_not_found", $"user can't be null")});
 
             var appUser = user.ToApplicationUser();
             IdentityResult identityResult = await _userManager.UpdateAsync(appUser);
 
             return new UpdateUserResponse(appUser.ToUserId(), identityResult.Succeeded,
-                identityResult.Errors.Select(e => new Error(e.Code, e.Description)));
+                identityResult.Errors.Select(e => new BaseError(e.Code, e.Description)));
         }
 
         private async Task InvalidateCache(string key)

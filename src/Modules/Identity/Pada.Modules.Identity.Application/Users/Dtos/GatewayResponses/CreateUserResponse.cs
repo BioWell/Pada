@@ -6,12 +6,12 @@ namespace Pada.Modules.Identity.Application.Users.Dtos.GatewayResponses
 {
     public class CreateUserResponse : GatewayResponse<UserId>
     {
-        public CreateUserResponse(UserId userId, bool isSuccess = true, IEnumerable<Error> errors = default)
+        public CreateUserResponse(UserId userId, bool isSuccess = true, IEnumerable<BaseError> errors = default)
             : base(userId, isSuccess, errors)
         {
         }
 
-        public CreateUserResponse(IEnumerable<Error> errors = default) : base(errors)
+        public CreateUserResponse(IEnumerable<BaseError> errors = default) : base(errors)
         {
         }
     }

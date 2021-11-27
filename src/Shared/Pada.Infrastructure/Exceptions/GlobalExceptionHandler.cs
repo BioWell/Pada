@@ -47,51 +47,52 @@ namespace Pada.Infrastructure.Exceptions
                         response.StatusCode = StatusCodes.Status409Conflict;
                         responseModel = new ResultModel<string>("Application rule broken",
                             false,
-                            new List<Error>() {new Error(StatusCodes.Status409Conflict.ToString(), e.AppMessage)});
+                            new List<BaseError>() {new BaseError(StatusCodes.Status409Conflict.ToString(), e.AppMessage)});
                         break;
                     case DomainException e:
                         response.StatusCode = StatusCodes.Status409Conflict;
                         responseModel = new ResultModel<string>("Domain rule broken", 
                             false,
-                            new List<Error>() {new Error(StatusCodes.Status409Conflict.ToString(), e.AppMessage)});
+                            new List<BaseError>() {new BaseError(StatusCodes.Status409Conflict.ToString(), e.AppMessage)});
                         break;
                     case AppValidationException e:
                         response.StatusCode = StatusCodes.Status400BadRequest;                        
-                        responseModel = new ResultModel<string>("Input validation rules broken", false,
-                            new List<Error>()
+                        responseModel = new ResultModel<string>("Input validation rules broken", 
+                            false,
+                            new List<BaseError>()
                             {
-                                new Error(StatusCodes.Status409Conflict.ToString(), JsonConvert.SerializeObject(e.Errors))
+                                new BaseError(e.Errors)
                             });
                         break;
                     case BadRequestException e:
                         response.StatusCode = StatusCodes.Status400BadRequest;
                         responseModel = new ResultModel<string>("Bad request exception", 
                             false,
-                            new List<Error>() {new Error(StatusCodes.Status400BadRequest.ToString(), e.AppMessage)});
+                            new List<BaseError>() {new BaseError(StatusCodes.Status400BadRequest.ToString(), e.AppMessage)});
                         break;
                     case NotFoundException e:
                         response.StatusCode = StatusCodes.Status404NotFound;
                         responseModel = new ResultModel<string>("Not found exception", 
                             false,
-                            new List<Error>() {new Error(StatusCodes.Status404NotFound.ToString(), e.AppMessage)});
+                            new List<BaseError>() {new BaseError(StatusCodes.Status404NotFound.ToString(), e.AppMessage)});
                         break;
                     case ApiException e:
                         response.StatusCode = StatusCodes.Status500InternalServerError;
                         responseModel = new ResultModel<string>("Api services exception", 
                             false,
-                            new List<Error>() {new Error(StatusCodes.Status500InternalServerError.ToString(), e.AppMessage)});
+                            new List<BaseError>() {new BaseError(StatusCodes.Status500InternalServerError.ToString(), e.AppMessage)});
                         break;
                     case CoreException e:
                         response.StatusCode = StatusCodes.Status500InternalServerError;
                         responseModel = new ResultModel<string>("Internal server exception", 
                             false,
-                            new List<Error>() {new Error(StatusCodes.Status500InternalServerError.ToString(), e.AppMessage)});
+                            new List<BaseError>() {new BaseError(StatusCodes.Status500InternalServerError.ToString(), e.AppMessage)});
                         break;
                     default:
                         response.StatusCode = StatusCodes.Status500InternalServerError;
                         responseModel = new ResultModel<string>("Internal server exception", 
                             false,
-                            new List<Error>() {new Error(StatusCodes.Status500InternalServerError.ToString(), "Internal error")});
+                            new List<BaseError>() {new BaseError(StatusCodes.Status500InternalServerError.ToString(), "Internal error")});
                         break;
                 }
 
