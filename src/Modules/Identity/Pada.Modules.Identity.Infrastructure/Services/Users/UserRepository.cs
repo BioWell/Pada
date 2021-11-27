@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -54,8 +55,8 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
         public async Task<CreateUserResponse> AddAsync(User user)
         {
             if (user is null)
-                return new CreateUserResponse(new BaseError[]
-                    {new("user_not_found", $"user can't be null")});
+                return new CreateUserResponse(new BaseError("user_not_found", 
+                    $"user can't be null"));
 
             var appUser = user.ToApplicationUser();
 
@@ -64,22 +65,28 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
                 identityResult = await _userManager.CreateAsync(appUser);
             else
                 identityResult = await _userManager.CreateAsync(appUser, user.Password);
-
-            return new CreateUserResponse(Guid.Parse(appUser.Id), identityResult.Succeeded,
-                identityResult.Errors.Select(e => new BaseError(e.Code, e.Description)));
+            
+            return new CreateUserResponse(Guid.Parse(appUser.Id),
+                identityResult.Succeeded,
+                new BaseError(identityResult.Errors
+                    .Distinct()
+                    .ToDictionary(x => x.Code, x => new string[]{ x.Description})));
         }
 
         public async Task<UpdateUserResponse> UpdateAsync(User user)
         {
             if (user is null)
-                return new UpdateUserResponse(new BaseError[]
-                    {new("user_not_found", $"user can't be null")});
+                return new UpdateUserResponse(new BaseError("user_not_found", 
+                    $"user can't be null"));
 
             var appUser = user.ToApplicationUser();
             IdentityResult identityResult = await _userManager.UpdateAsync(appUser);
 
-            return new UpdateUserResponse(appUser.ToUserId(), identityResult.Succeeded,
-                identityResult.Errors.Select(e => new BaseError(e.Code, e.Description)));
+            return new UpdateUserResponse(appUser.ToUserId(),
+                identityResult.Succeeded,
+                new BaseError(identityResult.Errors
+                    .Distinct()
+                    .ToDictionary(x => x.Code, x => new string[]{ x.Description})));
         }
 
         private async Task InvalidateCache(string key)

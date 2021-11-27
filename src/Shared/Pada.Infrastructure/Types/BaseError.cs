@@ -2,23 +2,23 @@
 
 namespace Pada.Infrastructure.Types
 {
-    public sealed class BaseError
+    public class BaseError
     {
-        public IDictionary<string, string[]> Messages { get; } = new Dictionary<string, string[]>();
+        public IDictionary<string, string[]> Errors { get; } = new Dictionary<string, string[]>();
 
-        public BaseError(string code, string message)
+        public BaseError(string code, string error)
         {
-            Messages.Add(code, new[] {message});
+            Errors.Add(code, new[] {error});
         }
 
-        public BaseError(string code, string[] messages)
+        public BaseError(string code, string[] errors)
         {
-            Messages.Add(code, messages);
+            Errors.Add(code, errors);
         }
         
-        public BaseError(IDictionary<string, string[]> messages )
+        public BaseError(IDictionary<string, string[]> errors )
         {
-            Messages = messages;
+            Errors = errors;
         }
     }
 }

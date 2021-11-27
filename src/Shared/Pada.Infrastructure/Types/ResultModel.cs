@@ -4,25 +4,25 @@ namespace Pada.Infrastructure.Types
 {
     public class ResultModel<T>
     {
-        public ResultModel(T data, bool success = true, IEnumerable<BaseError> errors = default!)
+        public ResultModel(T data, bool success = true, BaseError errors = default!)
         {
             Datas = data;
             IsSuccess = success;
             Errors = errors;
         }
 
-        public ResultModel(IEnumerable<BaseError> errors)
+        public ResultModel(BaseError errors)
         {
             IsSuccess = false;
             Errors = errors;
         }
 
-        public static ResultModel<T> Create(T data, bool isSuccess = true, IEnumerable<BaseError> errors = default!)
+        public static ResultModel<T> Create(T data, bool isSuccess = true, BaseError errors = default!)
         {
             return new(data, isSuccess, errors);
         }
 
-        public static ResultModel<T> Fail(IEnumerable<BaseError> errors = default!)
+        public static ResultModel<T> Fail(BaseError errors = default!)
         {
             return new ResultModel<T>(default, false, errors);
         }
@@ -34,29 +34,29 @@ namespace Pada.Infrastructure.Types
 
         public T Datas { get; }
         public bool IsSuccess { get; }
-        public IEnumerable<BaseError> Errors { get; }
+        public BaseError Errors { get; }
     }
 
     public class ResultModel
     {
-        public ResultModel(bool success, IEnumerable<BaseError> errors = default!)
+        public ResultModel(bool success, BaseError errors = default!)
         {
             IsSuccess = success;
             Errors = errors;
         }
 
-        public ResultModel(IEnumerable<BaseError> errors)
+        public ResultModel(BaseError errors)
         {
             IsSuccess = false;
             Errors = errors;
         }
 
-        public static ResultModel Create(bool isSuccess = true, IEnumerable<BaseError> errors = default!)
+        public static ResultModel Create(bool isSuccess = true, BaseError errors = default!)
         {
             return new(isSuccess, errors);
         }
 
-        public static ResultModel Fail(IEnumerable<BaseError> errors = default!)
+        public static ResultModel Fail(BaseError errors = default!)
         {
             return new ResultModel(false, errors);
         }
@@ -67,6 +67,6 @@ namespace Pada.Infrastructure.Types
         }
 
         public bool IsSuccess { get; }
-        public IEnumerable<BaseError> Errors { get; }
+        public BaseError Errors { get; }
     }
 }
