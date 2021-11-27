@@ -8,6 +8,7 @@ namespace Pada.Modules.Identity.Application.Users.Exceptions
 
         public EmailAlreadyInUsedException(string email) : base($"Email '{email}' is already in use.")
         {
+            Code = nameof(Email);
             Email = email;
         }
     }

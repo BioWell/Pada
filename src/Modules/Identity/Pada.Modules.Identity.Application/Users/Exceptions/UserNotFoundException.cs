@@ -10,6 +10,7 @@ namespace Pada.Modules.Identity.Application.Users.Exceptions
 
         public UserNotFoundException() : base("User not found.")
         {
+            Code = "User";
         }
         public UserNotFoundException(Guid userId) : base($"User with ID: '{userId}' was not found.")
         {

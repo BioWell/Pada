@@ -7,6 +7,7 @@ namespace Pada.Modules.Identity.Application.Users.Exceptions
         public RegisterNewUserFailedException(string Name) : base(
             $"Register user with name '{Name}' failed.")
         {
+            Code = "Register";
         }
     }
 }

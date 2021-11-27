@@ -7,6 +7,7 @@ namespace Pada.Modules.Identity.Application.Users.Exceptions
         public IdentityException(string reason) : base(
             $"System SignUp '{reason}'.")
         {
+            Code = "Identity";
         }
     }
 }

@@ -8,6 +8,7 @@ namespace Pada.Modules.Identity.Application.Users.Exceptions
 
         public EmailInvalidException(string email) : base($"Email '{email}' is invalid.")
         {
+            Code = nameof(Email);
             Email = email;
         }
     }

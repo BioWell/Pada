@@ -4,21 +4,25 @@ namespace Pada.Infrastructure.Types
 {
     public class GatewayResponse<T> : ResultModel<T>
     {
-        public GatewayResponse(T data, bool isSuccess = true, BaseError errors = default)
+        public GatewayResponse(T data, bool isSuccess = true, IDictionary<string, string[]> errors = default)
             : base(data, isSuccess, errors)
         {
         }
 
-        public GatewayResponse(BaseError errors) : base(errors)
+        public GatewayResponse(IDictionary<string, string[]> errors) : base(errors)
+        {
+        }
+        
+        public GatewayResponse(string code, string error) : base(code, error)
         {
         }
 
-        public new static GatewayResponse<T> Create(T data, bool isSuccess = true, BaseError errors = default!)
+        public new static GatewayResponse<T> Create(T data, bool isSuccess = true, IDictionary<string, string[]> errors = default!)
         {
             return new(data, isSuccess, errors);
         }
 
-        public new static GatewayResponse<T> Fail(BaseError errors = default!)
+        public new static GatewayResponse<T> Fail(IDictionary<string, string[]> errors = default!)
         {
             return new GatewayResponse<T>(default, false, errors);
         }
@@ -31,20 +35,24 @@ namespace Pada.Infrastructure.Types
 
     public class GatewayResponse : ResultModel
     {
-        public GatewayResponse(bool success, BaseError errors = default!) : base(success, errors)
+        public GatewayResponse(bool success, IDictionary<string, string[]> errors = default!) : base(success, errors)
         {
         }
 
-        public GatewayResponse(BaseError errors) : base(errors)
+        public GatewayResponse(IDictionary<string, string[]> errors) : base(errors)
+        {
+        }
+        
+        public GatewayResponse(string code, string error) : base(code, error)
         {
         }
 
-        public new static GatewayResponse Create(bool isSuccess = true, BaseError errors = default!)
+        public new static GatewayResponse Create(bool isSuccess = true, IDictionary<string, string[]> errors = default!)
         {
             return new(isSuccess, errors);
         }
 
-        public new static GatewayResponse Fail(BaseError errors = default!)
+        public new static GatewayResponse Fail(IDictionary<string, string[]> errors = default!)
         {
             return new GatewayResponse(false, errors);
         }

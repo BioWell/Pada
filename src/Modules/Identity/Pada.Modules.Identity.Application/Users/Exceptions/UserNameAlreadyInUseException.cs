@@ -9,6 +9,7 @@ namespace Pada.Modules.Identity.Application.Users.Exceptions
         public UserNameAlreadyInUseException(string name) : base($"UserName '{name}' is already in used.")
         {
             Name = name;
+            Code = nameof(Name);
         }
     }
 }
