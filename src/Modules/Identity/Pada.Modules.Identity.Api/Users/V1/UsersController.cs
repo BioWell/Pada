@@ -25,7 +25,6 @@ namespace Pada.Modules.Identity.Api.Users.V1
         }
 
         // POST api/v1/identity/users/Register
-        // [HttpPost]
         [HttpPost("Register")]
         [AllowAnonymous]
         public async Task<ActionResult> RegisterAsync(RegisterNewUserRequest request)

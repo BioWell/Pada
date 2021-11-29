@@ -96,13 +96,6 @@ namespace Pada.Modules.Identity.Application.Users.Features.RegisterNewUser
 
         public async Task<Unit> Handle(RegisterNewUserByPhoneCommand command, CancellationToken cancellationToken = default)
         {
-            var verify = RegexHelper.VerifyPhone(command.PhoneNumber);
-            if (!verify.Succeeded)
-            {
-                _logger.LogError($"PhoneNumber '{command.PhoneNumber}' is invalid");
-                throw new PhoneIsInvalidException(command.PhoneNumber);
-            }
-
             var anyPhone = _userRepository.IsPhoneUsedAsync(command.PhoneNumber);
             if (anyPhone)
             {

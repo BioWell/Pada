@@ -7,11 +7,11 @@ namespace Pada.Modules.Identity.Application.Users.Features.GetUser
 {
     public class GetUserByIdQuery : IRequest<GetUserResponse>
     {
+        public Guid UserId { get; }
+
         public GetUserByIdQuery(UserId userId)
         {
             UserId = userId;
         }
-
-        public Guid UserId { get; }
     }
 }

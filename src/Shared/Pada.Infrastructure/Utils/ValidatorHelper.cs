@@ -1,11 +1,17 @@
 ﻿using System.Text.RegularExpressions;
+using FluentValidation;
 
 namespace Pada.Infrastructure.Utils
 {
-    public class RegexHelper
+    public static class ValidatorHelper
     {
         const string patternEmail = @"\w[-\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\.)+[A-Za-z]{2,14}";
         const string patternPhone = @"^\d{11}$";
+        
+        // public static IRuleBuilderOptions<T, bool> MatchPhoneNumberRule<T>(this IRuleBuilder<T, bool> ruleBuilder)
+        // {
+        //     return ruleBuilder.SetValidator(new Regex(patternEmail));
+        // }
 
         public static (bool Succeeded, string Message) VerifyEmail(string input)
         {
@@ -16,7 +22,7 @@ namespace Pada.Infrastructure.Utils
                 return (false, "邮箱地址格式错误");
             return (true, "邮箱地址格式正确");
         }
-
+        
         public static (bool Succeeded, string Message) VerifyPhone(string input)
         {
             if (string.IsNullOrWhiteSpace(input.Trim()))
@@ -25,6 +31,16 @@ namespace Pada.Infrastructure.Utils
             if (!regex.IsMatch(input.Trim()))
                 return (false, "手机号格式错误");
             return (true, "手机号格式正确");
+        } 
+        
+        public static bool ValidPhone(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input.Trim()))
+                return false;
+            var regex = new Regex(patternPhone);
+            if (!regex.IsMatch(input.Trim()))
+                return false;
+            return true;
         } 
     }
 }

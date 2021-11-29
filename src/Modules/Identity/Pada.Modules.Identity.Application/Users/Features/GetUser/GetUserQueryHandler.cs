@@ -74,7 +74,7 @@ namespace Pada.Modules.Identity.Application.Users.Features.GetUser
             if (user == null)
                 throw new UserNotFoundException(query.Phone);
 
-            _logger.LogInformation($"Get user with UserName '{user.UserName}' successfully.");
+            _logger.LogInformation($"Get user with Phone '{user.PhoneNumber}' successfully.");
             return new GetUserResponse(_mapper.Map<UserDto>(user));
         }
     }

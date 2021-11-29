@@ -7,6 +7,25 @@ namespace Pada.Modules.Identity.Application.Users.Features.RegisterNewUser
 {
     public class RegisterNewUserCommand : IRequest
     {
+        public string UserName { get; }
+        public bool EmailConfirmed { get; }
+        public string Email { get; }
+        public string FirstName { get; }
+        public string LastName { get; }
+        public string PhoneNumber { get; }
+        public string Name { get; }
+        public bool IsAdministrator { get; }
+        public string PhotoUrl { get; }
+        public UserType UserType { get; }
+        public string Status { get; }
+        public string Password { get; }
+        public bool IsActive { get; }
+        public IEnumerable<string> Roles { get; }
+        public IEnumerable<string> Permissions { get; }
+        public Guid Id { get; set; }
+        public Guid CorrelationId { get; set; }
+        public DateTime OccurredOn { get; set; } = DateTime.Now;
+
         public RegisterNewUserCommand(Guid id, string email, string firstName, string lastName,
             string name, string userName, string phoneNumber, string password,
             IReadOnlyList<string> permissions, UserType userType, bool isAdmin = false, bool isActive = true,
@@ -31,24 +50,5 @@ namespace Pada.Modules.Identity.Application.Users.Features.RegisterNewUser
             IsAdministrator = isAdmin;
             IsActive = isActive;
         }
-
-        public string UserName { get; }
-        public bool EmailConfirmed { get; }
-        public string Email { get; }
-        public string FirstName { get; }
-        public string LastName { get; }
-        public string PhoneNumber { get; }
-        public string Name { get; }
-        public bool IsAdministrator { get; }
-        public string PhotoUrl { get; }
-        public UserType UserType { get; }
-        public string Status { get; }
-        public string Password { get; }
-        public bool IsActive { get; }
-        public IEnumerable<string> Roles { get; }
-        public IEnumerable<string> Permissions { get; }
-        public Guid Id { get; set; }
-        public Guid CorrelationId { get; set; }
-        public DateTime OccurredOn { get; set; } = DateTime.Now;
     }
 }
