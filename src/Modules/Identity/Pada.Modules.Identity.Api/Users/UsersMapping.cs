@@ -18,6 +18,11 @@ namespace Pada.Modules.Identity.Api.Users
                     req.UserType, req.IsAdministrator, req.IsActive,
                     req.Roles != null ? req.Roles.ToList() : new List<string>(),
                     req.EmailConfirmed, req.PhotoUrl, req.Status));
+
+            CreateMap<RegisterNewUserByPhoneRequest, RegisterNewUserByPhoneCommand>()
+                .ForMember(d => d.PhoneNumber, 
+                    opt => opt.MapFrom(s => s.Phone))
+                .ConstructUsing(req => new RegisterNewUserByPhoneCommand(req.Phone));
         }
     }
 }

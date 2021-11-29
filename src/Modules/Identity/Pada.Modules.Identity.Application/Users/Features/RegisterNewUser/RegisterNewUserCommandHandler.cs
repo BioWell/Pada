@@ -1,30 +1,30 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Pada.Abstractions.Services.Sms;
+using Pada.Infrastructure.Utils;
 using Pada.Modules.Identity.Application.Users.Contracts;
 using Pada.Modules.Identity.Application.Users.Exceptions;
 using Pada.Modules.Identity.Domain.Aggregates.Users;
 
 namespace Pada.Modules.Identity.Application.Users.Features.RegisterNewUser
 {
-    public class RegisterNewUserCommandHandler : IRequestHandler<RegisterNewUserCommand>
+    public class RegisterNewUserCommandHandler : IRequestHandler<RegisterNewUserCommand>,
+        IRequestHandler<RegisterNewUserByPhoneCommand>
     {
         private readonly IUserRepository _userRepository;
         private readonly ILogger<RegisterNewUserCommandHandler> _logger;
-        private readonly IAppIdentityDbContext _identityDbContext;
+        private readonly ISmsSender _smsSender;
         private readonly RegistrationOptions _registrationOptions;
         public RegisterNewUserCommandHandler(IUserRepository userRepository,
             ILogger<RegisterNewUserCommandHandler> logger,
-            IAppIdentityDbContext identityDbContext, 
             RegistrationOptions registrationOptions)
         {
             _userRepository = userRepository;
             _logger = logger;
-            _identityDbContext = identityDbContext;
             _registrationOptions = registrationOptions;
         }
 
@@ -91,6 +91,28 @@ namespace Pada.Modules.Identity.Application.Users.Features.RegisterNewUser
             // user.ChangePermissions(command.Permissions?.Select(x => Permission.Of(x, "")).ToArray());
             // user.ChangeRoles(command.Roles?.Select(x => Role.Of(x, x)).ToArray());
 
+            return Unit.Value;
+        }
+
+        public async Task<Unit> Handle(RegisterNewUserByPhoneCommand command, CancellationToken cancellationToken = default)
+        {
+            var verify = RegexHelper.VerifyPhone(command.PhoneNumber);
+            if (!verify.Succeeded)
+            {
+                _logger.LogError($"PhoneNumber '{command.PhoneNumber}' is invalid");
+                throw new PhoneIsInvalidException(command.PhoneNumber);
+            }
+
+            var anyPhone = _userRepository.IsPhoneUsedAsync(command.PhoneNumber);
+            if (anyPhone)
+            {
+                _logger.LogError($"PhoneNumber '{command.PhoneNumber}' already in used");
+                throw new UserPhoneAlreadyInUseException(command.PhoneNumber);
+            }
+            
+            var code = CodeGen.GenRandomNumber();
+            var result = await _smsSender.SendCaptchaAsync(command.PhoneNumber, code);
+            
             return Unit.Value;
         }
     }

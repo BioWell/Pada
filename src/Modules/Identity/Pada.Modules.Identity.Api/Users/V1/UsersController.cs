@@ -8,7 +8,6 @@ using Pada.Modules.Identity.Api.Users.Models.Requests;
 using Pada.Modules.Identity.Application.Users.Dtos.UseCaseResponses;
 using Pada.Modules.Identity.Application.Users.Features.Activation;
 using Pada.Modules.Identity.Application.Users.Features.GetUser;
-using Pada.Modules.Identity.Application.Users.Features.Lock;
 using Pada.Modules.Identity.Application.Users.Features.RegisterNewUser;
 
 namespace Pada.Modules.Identity.Api.Users.V1
@@ -24,7 +23,7 @@ namespace Pada.Modules.Identity.Api.Users.V1
             _httpContextAccessor = httpContextAccessor;
         }
 
-        // POST api/v1/identity/users
+        // POST api/v1/identity/users/Register
         [HttpPost]
         [AllowAnonymous]
         public async Task<ActionResult> RegisterAsync(RegisterNewUserRequest request)
@@ -37,6 +36,17 @@ namespace Pada.Modules.Identity.Api.Users.V1
             var name = nameof(GetUserByIdAsync);
             return CreatedAtRoute(name, new {id = command.Id}, command);
         }
+        
+        // POST api/v1/identity/users/RegisterVerifyPhone
+        // [HttpPost]
+        // [AllowAnonymous]
+        // public async Task<ActionResult> RegisterVerifyPhoneAsync(RegisterNewUserByPhoneRequest request)
+        // {
+        //     var command = Mapper.Map<RegisterNewUserByPhoneRequest>(request);
+        //     await Mediator.Send(command);
+        //     var name = nameof(FindByPhoneAsync);
+        //     return CreatedAtRoute(name, new {id = command.Phone}, command);
+        // }
 
         // GET api/v1/identity/users/id/{userId}
         [HttpGet("id/{id}", Name = nameof(GetUserByIdAsync))]
@@ -67,6 +77,16 @@ namespace Pada.Modules.Identity.Api.Users.V1
 
             return Ok(result);
         }
+        
+        // GET api/v1/identity/users/Phone/{phone}
+        [HttpGet("Phone/{phone}", Name = nameof(FindByPhoneAsync))]
+        [AllowAnonymous]
+        public async Task<ActionResult<UserDto>> FindByPhoneAsync([FromRoute] string phone)
+        {
+            var result = await Mediator.Send(new GetUserByPhoneQuery(phone));
+
+            return Ok(result);
+        }
 
         // Put api/v1/identity/users/active-user
         [HttpPut("active-user")]
@@ -87,12 +107,12 @@ namespace Pada.Modules.Identity.Api.Users.V1
         }
         
         // POST api/v1/identity/users/{userId}/lock-user
-        [HttpPost("{userId}/lock-user")]
-        [AllowAnonymous]
-        public async Task<IActionResult> LockUserasync([FromRoute] string userId)
-        {
-            var result = await Mediator.Send(new LockUserCommand(userId));
-            return Ok(result);
-        }
+        // [HttpPost("{userId}/lock-user")]
+        // [AllowAnonymous]
+        // public async Task<IActionResult> LockUserasync([FromRoute] string userId)
+        // {
+        //     var result = await Mediator.Send(new LockUserCommand(userId));
+        //     return Ok(result);
+        // }
     }
 }

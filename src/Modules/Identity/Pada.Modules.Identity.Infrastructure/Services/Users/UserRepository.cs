@@ -10,12 +10,14 @@ using Pada.Modules.Identity.Application.Users.Contracts;
 using Pada.Modules.Identity.Application.Users.Dtos.GatewayResponses;
 using Pada.Modules.Identity.Domain.Aggregates.Users;
 using Pada.Modules.Identity.Infrastructure.Aggregates.Users;
+using Pada.Modules.Identity.Infrastructure.Persistence;
 
 namespace Pada.Modules.Identity.Infrastructure.Services.Users
 {
     public class UserRepository : IUserRepository
     {
         private readonly CustomUserManager _userManager;
+        private readonly AppIdentityDbContext _dbContext;
         private readonly IEasyCachingProvider _cachingProvider;
         private readonly IMapper _mapper;
         private readonly IdentityOptions _identityOptionsValue;
@@ -23,11 +25,13 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
         public UserRepository(CustomUserManager userManager,
             IEasyCachingProvider cachingProvider,
             IMapper mapper, 
-            IOptions<IdentityOptions> identityOptions)
+            IOptions<IdentityOptions> identityOptions, 
+            AppIdentityDbContext dbContext)
         {
             _userManager = userManager;
             _cachingProvider = cachingProvider;
             _mapper = mapper;
+            _dbContext = dbContext;
             _identityOptionsValue = identityOptions.Value;
         }
 
@@ -53,6 +57,19 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
                 await InvalidateCache(CacheKey.With(nameof(FindByNameAsync), userName));
             var appUser = await _userManager.FindByNameAsync(userName);
             return appUser?.ToUser();
+        }
+        
+        public async Task<User> FindByPhoneAsync(string phone, bool invalidateCache = false)
+        {
+            if (invalidateCache)
+                await InvalidateCache(CacheKey.With(nameof(FindByPhoneAsync), phone));
+            var appUser = _dbContext.Users.FirstOrDefault(c => c.PhoneNumber == phone);
+            return appUser?.ToUser();
+        }
+        
+        public bool IsPhoneUsedAsync(string phone)
+        {
+            return _userManager.Users.Any(c => c.PhoneNumber == phone);
         }
 
         public async Task<CreateUserResponse> AddAsync(User user)
