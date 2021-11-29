@@ -17,10 +17,10 @@ namespace Pada.Modules.Identity.Application.Users.Exceptions
             Code = "User";
             UserId = userId;
         }
-        public UserNotFoundException(string userNameOrEmail) : base($"UserName or Email: '{userNameOrEmail}' was not found.")
+        public UserNotFoundException(string userNameOrPhoneOrEmail) : base($"UserName Phone or Email: '{userNameOrPhoneOrEmail}' was not found.")
         {
             Code = "User";
-            UserNameOrEmail = userNameOrEmail;
+            UserNameOrEmail = userNameOrPhoneOrEmail;
         }
     }
 }

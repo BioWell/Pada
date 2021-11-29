@@ -8,6 +8,7 @@ using Pada.Modules.Identity.Api.Users.Models.Requests;
 using Pada.Modules.Identity.Application.Users.Dtos.UseCaseResponses;
 using Pada.Modules.Identity.Application.Users.Features.Activation;
 using Pada.Modules.Identity.Application.Users.Features.GetUser;
+using Pada.Modules.Identity.Application.Users.Features.Lock;
 using Pada.Modules.Identity.Application.Users.Features.RegisterNewUser;
 
 namespace Pada.Modules.Identity.Api.Users.V1
@@ -24,7 +25,8 @@ namespace Pada.Modules.Identity.Api.Users.V1
         }
 
         // POST api/v1/identity/users/Register
-        [HttpPost]
+        // [HttpPost]
+        [HttpPost("Register")]
         [AllowAnonymous]
         public async Task<ActionResult> RegisterAsync(RegisterNewUserRequest request)
         {
@@ -107,12 +109,12 @@ namespace Pada.Modules.Identity.Api.Users.V1
         }
         
         // POST api/v1/identity/users/{userId}/lock-user
-        // [HttpPost("{userId}/lock-user")]
-        // [AllowAnonymous]
-        // public async Task<IActionResult> LockUserasync([FromRoute] string userId)
-        // {
-        //     var result = await Mediator.Send(new LockUserCommand(userId));
-        //     return Ok(result);
-        // }
+        [HttpPost("{userId}/lock-user")]
+        [AllowAnonymous]
+        public async Task<IActionResult> LockUserasync([FromRoute] string userId)
+        {
+            var result = await Mediator.Send(new LockUserCommand(userId));
+            return Ok(result);
+        }
     }
 }
