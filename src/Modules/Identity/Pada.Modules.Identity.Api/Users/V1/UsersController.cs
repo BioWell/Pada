@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Pada.Infrastructure.Web;
 using Pada.Modules.Identity.Api.Users.Models.Requests;
-using Pada.Modules.Identity.Application.Users.Dtos.UseCaseResponses;
+using Pada.Modules.Identity.Application.Users.Dtos;
 using Pada.Modules.Identity.Application.Users.Features.Activation;
 using Pada.Modules.Identity.Application.Users.Features.GetUser;
 using Pada.Modules.Identity.Application.Users.Features.Lock;
@@ -38,16 +38,16 @@ namespace Pada.Modules.Identity.Api.Users.V1
             return CreatedAtRoute(name, new {id = command.Id}, command);
         }
         
-        // POST api/v1/identity/users/RegisterVerifyPhone
-        // [HttpPost]
-        // [AllowAnonymous]
-        // public async Task<ActionResult> RegisterVerifyPhoneAsync(RegisterNewUserByPhoneRequest request)
-        // {
-        //     var command = Mapper.Map<RegisterNewUserByPhoneRequest>(request);
-        //     await Mediator.Send(command);
-        //     var name = nameof(FindByPhoneAsync);
-        //     return CreatedAtRoute(name, new {id = command.Phone}, command);
-        // }
+        // POST api/v1/identity/users/RegisterByPhone
+        [HttpPost("RegisterByPhone")]
+        [AllowAnonymous]
+        public async Task<ActionResult> RegisterByPhoneAsync(RegisterNewUserByPhoneRequest request)
+        {
+            var command = Mapper.Map<RegisterNewUserByPhoneRequest>(request);
+            await Mediator.Send(command);
+            var name = nameof(FindByPhoneAsync);
+            return CreatedAtRoute(name, new {id = command.Phone}, command);
+        }
 
         // GET api/v1/identity/users/id/{userId}
         [HttpGet("id/{id}", Name = nameof(GetUserByIdAsync))]

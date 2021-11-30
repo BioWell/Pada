@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Pada.Modules.Identity.Application.Users.Dtos.GatewayResponses;
+using Pada.Modules.Identity.Application.Users.Dtos;
 using Pada.Modules.Identity.Domain.Aggregates.Users;
 
 namespace Pada.Modules.Identity.Application.Users.Contracts

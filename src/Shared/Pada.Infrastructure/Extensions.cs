@@ -12,6 +12,7 @@ using Pada.Abstractions.Modules;
 using Pada.Infrastructure.Caching;
 using Pada.Infrastructure.Exceptions;
 using Pada.Infrastructure.Logging;
+using Pada.Infrastructure.Services;
 using Pada.Infrastructure.Validations;
 using Pada.Infrastructure.Web.Extensions;
 
@@ -46,6 +47,7 @@ namespace Pada.Infrastructure
             services.AddWebApi(configuration);
             services.AddEndpointsApiExplorer();
             services.AddCaching(configuration);
+            services.AddServicesApplicationLayer(configuration);
             // services.AddSwaggerGen();
             
             // 4. Register Exceptions services

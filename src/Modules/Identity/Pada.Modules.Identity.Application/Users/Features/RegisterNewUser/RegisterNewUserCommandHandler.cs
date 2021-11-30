@@ -21,11 +21,13 @@ namespace Pada.Modules.Identity.Application.Users.Features.RegisterNewUser
         private readonly RegistrationOptions _registrationOptions;
         public RegisterNewUserCommandHandler(IUserRepository userRepository,
             ILogger<RegisterNewUserCommandHandler> logger,
-            RegistrationOptions registrationOptions)
+            RegistrationOptions registrationOptions,
+            ISmsSender smsSender)
         {
             _userRepository = userRepository;
             _logger = logger;
             _registrationOptions = registrationOptions;
+            _smsSender = smsSender;
         }
 
         public async Task<Unit> Handle(RegisterNewUserCommand command,
@@ -106,6 +108,7 @@ namespace Pada.Modules.Identity.Application.Users.Features.RegisterNewUser
             var code = CodeGen.GenRandomNumber();
             var result = await _smsSender.SendCaptchaAsync(command.PhoneNumber, code);
             
+            _logger.LogInformation($"RegisterNewUser '{result.Success}' message {result.Message}");
             return Unit.Value;
         }
     }

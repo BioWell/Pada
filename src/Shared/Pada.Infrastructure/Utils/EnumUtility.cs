@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 
@@ -75,6 +76,11 @@ namespace Pada.Infrastructure.Utils
                 }
             }
             return result;
+        }
+        
+        public static bool IsNullOrEmpty<T>(this IEnumerable<T> data)
+        {
+            return data == null || !data.Any();
         }
     }
 }

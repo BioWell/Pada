@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 using EasyCaching.Core;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Pada.Abstractions.Auth;
 using Pada.Infrastructure.Caching;
+using Pada.Infrastructure.Utils;
 using Pada.Modules.Identity.Domain.Aggregates.Users;
 using Pada.Modules.Identity.Infrastructure.Aggregates.Roles;
 using Pada.Modules.Identity.Infrastructure.Aggregates.Users;
@@ -20,6 +22,7 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
     {
         private readonly IEasyCachingProvider _cachingProvider;
         private readonly RoleManager<AppRole> _roleManager;
+        private readonly IServiceScopeFactory _serviceScopeFactory;
 
         public CustomUserManager(IUserStore<AppUser> store,
             IOptions<IdentityOptions> optionsAccessor,
@@ -31,12 +34,31 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
             IServiceProvider services,
             ILogger<CustomUserManager> logger,
             IEasyCachingProviderFactory cachingFactory,
-            RoleManager<AppRole> roleManager)
+            RoleManager<AppRole> roleManager,
+            IServiceScopeFactory serviceScopeFactory)
             : base(store, optionsAccessor, passwordHasher, userValidators, passwordValidators, keyNormalizer, errors,
                 services, logger)
         {
             _cachingProvider = cachingFactory.GetCachingProvider("mem");
             _roleManager = roleManager;
+            _serviceScopeFactory = serviceScopeFactory;
+        }
+
+        public override async Task<AppUser> FindByLoginAsync(string loginProvider, string providerKey)
+        {
+            var cacheKey = CacheKey.With(nameof(FindByLoginAsync), loginProvider, providerKey);
+            var result = await _cachingProvider.GetAsync(cacheKey, async () =>
+            {
+                var user = await base.FindByLoginAsync(loginProvider, providerKey);
+                if (user != null)
+                {
+                    await LoadUserDetailsAsync(user);
+                }
+
+                return user;
+            }, TimeSpan.FromMinutes(10));
+
+            return result.Value!;
         }
 
         public override async Task<AppUser> FindByIdAsync(string userId)
@@ -45,6 +67,40 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
             var result = await _cachingProvider.GetAsync(cacheKey, async () =>
             {
                 var user = await base.FindByIdAsync(userId);
+                if (user != null)
+                {
+                    await LoadUserDetailsAsync(user);
+                }
+
+                return user;
+            }, TimeSpan.FromMinutes(10));
+
+            return result.Value!;
+        }
+
+        public override async Task<AppUser> FindByNameAsync(string userName)
+        {
+            var cacheKey = CacheKey.With(nameof(FindByNameAsync), userName);
+            var result = await _cachingProvider.GetAsync(cacheKey, async () =>
+            {
+                var user = await base.FindByNameAsync(userName);
+                if (user != null)
+                {
+                    await LoadUserDetailsAsync(user);
+                }
+
+                return user;
+            }, TimeSpan.FromMinutes(10));
+
+            return result.Value!;
+        }
+
+        public override async Task<AppUser> FindByEmailAsync(string email)
+        {
+            var cacheKey = CacheKey.With(nameof(FindByEmailAsync), email);
+            var result = await _cachingProvider.GetAsync(cacheKey, async () =>
+            {
+                var user = await base.FindByEmailAsync(email);
                 if (user != null)
                 {
                     await LoadUserDetailsAsync(user);
@@ -69,53 +125,40 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
             await LoadRelatedLogins(user);
         }
 
-        private async Task LoadRelatedRoles(AppUser user)
+        public override async Task<IdentityResult> ResetPasswordAsync(AppUser user, string token, string newPassword)
         {
-            if (user is not null && user.Roles is null)
-            {
-                user.Roles = new List<AppRole>();
-                foreach (var roleName in await base.GetRolesAsync(user))
-                {
-                    var role = await _roleManager.FindByNameAsync(roleName);
-                    if (role != null)
-                    {
-                        user.Roles.Add(role);
-                    }
-                }
-            }
+            //It is important to call base.FindByIdAsync method to avoid of update a cached user.
+            var existUser = await base.FindByIdAsync(user.Id);
+            var result = await base.ResetPasswordAsync(existUser, token, newPassword);
+
+            return result;
         }
 
-        private async Task LoadRelatedPermissions(AppUser user)
+        public override async Task<IdentityResult> ChangePasswordAsync(AppUser user, string currentPassword,
+            string newPassword)
         {
-            if (user is not null && user.Permissions is null)
+            var result = await base.ChangePasswordAsync(user, currentPassword, newPassword);
+            if (result == IdentityResult.Success)
             {
-                user.Permissions = (await GetClaimsAsync(user)).Select(AppPermission.TryCreateFromClaim).ToList();
+                var cacheKey = CacheKey.With(GetType(), nameof(FindByIdAsync), user.Id);
+                await _cachingProvider.RemoveAsync(cacheKey);
             }
+
+            return result;
         }
 
-        private async Task LoadRelatedLogins(AppUser user)
+        public override async Task<IdentityResult> DeleteAsync(AppUser user)
         {
-            if (user is not null && user.Logins is null)
+            using var scope = _serviceScopeFactory.CreateScope();
+
+            var result = await base.DeleteAsync(user);
+            if (result.Succeeded)
             {
-                // Read associated logins (compatibility with v2)
-                var logins = await base.GetLoginsAsync(user);
-                user.Logins = logins.Select(x => new IdentityUserLogin<string>
-                {
-                    LoginProvider = x.LoginProvider, ProviderKey = x.ProviderKey
-                }).ToArray();
             }
+
+            return result;
         }
 
-        public async Task LoadRelatedRefreshTokens(AppUser user)
-        {
-            if (user is not null && user.RefreshTokens is null)
-            {
-                var query = Users.Include(x => x.RefreshTokens);
-                var refreshTokens = (await query.SingleOrDefaultAsync(x => x.UserName == user.UserName));
-                user.RefreshTokens = null;
-            }
-        }
-        
         protected override async Task<IdentityResult> UpdateUserAsync(AppUser user)
         {
             var existentUser = await LoadExistingUser(user);
@@ -217,11 +260,113 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
                 {
                     existentUser.RefreshTokens.Remove(removeToken);
                 }
-                
+
                 await UpdateUserAsync(existentUser);
             }
 
             return result;
+        }
+
+        public override async Task<IdentityResult> CreateAsync(AppUser user)
+        {
+            var userResult = await base.CreateAsync(user);
+            userResult.LogResult($"a new user with userId '{user.Id}' added successfully.");
+            if (userResult.Succeeded)
+            {
+                var permissions = user.Permissions;
+                var roles = user.Roles;
+                if (permissions != null && permissions.Any())
+                {
+                    //Add
+                    foreach (var permission in permissions)
+                    {
+                        var claimResult = await AddClaimAsync(user,
+                            new Claim(CustomClaimTypes.Permission, permission.Name));
+                        claimResult.LogResult($"claim {permission.Name} added to user '{user.Id}' successfully.");
+                    }
+                }
+
+                if (roles != null && roles.Any())
+                {
+                    //Add
+                    foreach (var newRole in roles)
+                    {
+                        if (await _roleManager.RoleExistsAsync(newRole.Name))
+                        {
+                            var roleResult = await AddToRoleAsync(user, newRole.Name);
+                            roleResult.LogResult($"role '{newRole.Id}' added to user '{user.Id}' successfully.");
+                        }
+                    }
+                }
+
+                // add external logins
+                if (!user.Logins.IsNullOrEmpty())
+                {
+                    foreach (var login in user.Logins)
+                    {
+                        await AddLoginAsync(user, new UserLoginInfo(login.LoginProvider, login.ProviderKey, null));
+                    }
+                }
+            }
+
+            return userResult;
+        }
+
+        public override async Task<IdentityResult> CreateAsync(AppUser user, string password)
+        {
+            var userResult = await base.CreateAsync(user, password);
+
+            userResult.LogResult($"a new user with userId '{user.Id}' added successfully.",
+                $"there is an exception in creating user with id '{user.Id}'");
+
+            return userResult;
+        }
+
+        private async Task LoadRelatedRoles(AppUser user)
+        {
+            if (user is not null && user.Roles is null)
+            {
+                user.Roles = new List<AppRole>();
+                foreach (var roleName in await base.GetRolesAsync(user))
+                {
+                    var role = await _roleManager.FindByNameAsync(roleName);
+                    if (role != null)
+                    {
+                        user.Roles.Add(role);
+                    }
+                }
+            }
+        }
+
+        private async Task LoadRelatedPermissions(AppUser user)
+        {
+            if (user is not null && user.Permissions is null)
+            {
+                user.Permissions = (await GetClaimsAsync(user)).Select(AppPermission.TryCreateFromClaim).ToList();
+            }
+        }
+
+        private async Task LoadRelatedLogins(AppUser user)
+        {
+            if (user is not null && user.Logins is null)
+            {
+                // Read associated logins (compatibility with v2)
+                var logins = await base.GetLoginsAsync(user);
+                user.Logins = logins.Select(x => new IdentityUserLogin<string>
+                {
+                    LoginProvider = x.LoginProvider, ProviderKey = x.ProviderKey
+                }).ToArray();
+            }
+        }
+
+        public async Task LoadRelatedRefreshTokens(AppUser user)
+        {
+            if (user is not null && user.RefreshTokens is null)
+            {
+                var query = Users.Include(x => x.RefreshTokens);
+                var refreshTokens = (await query.SingleOrDefaultAsync(x => x.UserName == user.UserName));
+                user.RefreshTokens = null;
+            }
         }
 
         protected virtual async Task<AppUser> LoadExistingUser(AppUser user)

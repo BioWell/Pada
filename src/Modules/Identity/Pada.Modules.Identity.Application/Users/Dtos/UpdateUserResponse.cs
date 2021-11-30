@@ -2,7 +2,7 @@
 using Pada.Infrastructure.Types;
 using Pada.Modules.Identity.Domain.Aggregates.Users.Types;
 
-namespace Pada.Modules.Identity.Application.Users.Dtos.GatewayResponses
+namespace Pada.Modules.Identity.Application.Users.Dtos
 {
     public class UpdateUserResponse : GatewayResponse<UserId>
     {

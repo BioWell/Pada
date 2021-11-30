@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Pada.Infrastructure.Caching;
 using Pada.Modules.Identity.Application.Users.Contracts;
-using Pada.Modules.Identity.Application.Users.Dtos.GatewayResponses;
+using Pada.Modules.Identity.Application.Users.Dtos;
 using Pada.Modules.Identity.Domain.Aggregates.Users;
 using Pada.Modules.Identity.Infrastructure.Aggregates.Users;
 using Pada.Modules.Identity.Infrastructure.Persistence;
@@ -24,8 +24,8 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
 
         public UserRepository(CustomUserManager userManager,
             IEasyCachingProvider cachingProvider,
-            IMapper mapper, 
-            IOptions<IdentityOptions> identityOptions, 
+            IMapper mapper,
+            IOptions<IdentityOptions> identityOptions,
             AppIdentityDbContext dbContext)
         {
             _userManager = userManager;
@@ -58,7 +58,7 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
             var appUser = await _userManager.FindByNameAsync(userName);
             return appUser?.ToUser();
         }
-        
+
         public async Task<User> FindByPhoneAsync(string phone, bool invalidateCache = false)
         {
             if (invalidateCache)
@@ -67,6 +67,16 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
             return appUser?.ToUser();
         }
         
+        public async Task<User> FindByNameOrEmailAsync(string userNameOrEmail, bool invalidateCache = false)
+        {
+            if (invalidateCache) await InvalidateCache(CacheKey.With(nameof(FindByNameOrEmailAsync), userNameOrEmail));
+
+            var appUser = await _userManager.FindByNameAsync(userNameOrEmail) ??
+                          await _userManager.FindByEmailAsync(userNameOrEmail);
+
+            return appUser?.ToUser();
+        }
+
         public bool IsPhoneUsedAsync(string phone)
         {
             return _userManager.Users.Any(c => c.PhoneNumber == phone);
@@ -100,9 +110,9 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
             var appUser = user.ToApplicationUser();
             IdentityResult identityResult = await _userManager.UpdateAsync(appUser);
 
-            if (identityResult.Succeeded) 
+            if (identityResult.Succeeded)
                 await InvalidateUserCache(appUser);
-            
+
             return new UpdateUserResponse(appUser.ToUserId(),
                 identityResult.Succeeded,
                 identityResult.Errors
@@ -116,12 +126,12 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
 
             if (appUser is null)
                 return new LockUserResponse("user_not_found", $"User not found for userId: `{userId}`");
-            
+
             if (appUser.LockoutEnabled == false)
                 return new LockUserResponse("LockoutEnabled", $"LockoutEnabled is : `{appUser.LockoutEnabled}`");
-            
+
             var duration = _identityOptionsValue?.Lockout?.DefaultLockoutTimeSpan ?? TimeSpan.FromMinutes(15);
-            
+
             var identityResult = await _userManager.SetLockoutEndDateAsync(appUser,
                 DateTimeOffset.Now + duration);
 
@@ -142,6 +152,7 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
             await InvalidateCache(CacheKey.With(nameof(FindByIdAsync), Guid.Parse(appUser.Id).ToString()));
             await InvalidateCache(CacheKey.With(nameof(FindByEmailAsync), appUser.Email));
             await InvalidateCache(CacheKey.With(nameof(FindByNameAsync), appUser.UserName));
+            await InvalidateCache(CacheKey.With(nameof(FindByPhoneAsync), appUser.PhoneNumber));
         }
     }
 }

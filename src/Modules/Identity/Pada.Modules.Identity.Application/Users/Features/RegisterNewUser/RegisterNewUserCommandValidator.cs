@@ -1,9 +1,10 @@
 ﻿using FluentValidation;
 using Microsoft.Extensions.Localization;
+using Pada.Infrastructure.Utils;
 
 namespace Pada.Modules.Identity.Application.Users.Features.RegisterNewUser
 {
-    public class RegisterNewUserCommandValidator: AbstractValidator<RegisterNewUserCommand>
+    public class RegisterNewUserCommandValidator : AbstractValidator<RegisterNewUserCommand>
     {
         public RegisterNewUserCommandValidator()
         {
@@ -16,6 +17,16 @@ namespace Pada.Modules.Identity.Application.Users.Features.RegisterNewUser
             RuleFor(c => c.Email)
                 .NotEmpty().WithMessage("The {PropertyName} field is required.")
                 .EmailAddress().WithMessage("Invalid Email Address.");
+        }
+    }
+
+    public class RegisterNewUserByPhoneCommandValidator : AbstractValidator<RegisterNewUserByPhoneCommand>
+    {
+        public RegisterNewUserByPhoneCommandValidator()
+        {
+            RuleFor(c => c.PhoneNumber)
+                .NotEmpty().WithMessage("The {PropertyName} field is required.")
+                .Must(ValidatorHelper.ValidPhone).WithMessage("Invalid Phone.");
         }
     }
 }

@@ -5,8 +5,7 @@ using AutoMapper;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Pada.Modules.Identity.Application.Users.Contracts;
-using Pada.Modules.Identity.Application.Users.Dtos.GatewayResponses;
-using Pada.Modules.Identity.Application.Users.Dtos.UseCaseResponses;
+using Pada.Modules.Identity.Application.Users.Dtos;
 using Pada.Modules.Identity.Application.Users.Exceptions;
 
 namespace Pada.Modules.Identity.Application.Users.Features.GetUser

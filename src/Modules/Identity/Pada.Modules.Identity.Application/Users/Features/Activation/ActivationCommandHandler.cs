@@ -4,7 +4,7 @@ using Ardalis.GuardClauses;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Pada.Modules.Identity.Application.Users.Contracts;
-using Pada.Modules.Identity.Application.Users.Dtos.GatewayResponses;
+using Pada.Modules.Identity.Application.Users.Dtos;
 using Pada.Modules.Identity.Application.Users.Exceptions;
 
 namespace Pada.Modules.Identity.Application.Users.Features.Activation
@@ -22,7 +22,8 @@ namespace Pada.Modules.Identity.Application.Users.Features.Activation
             _logger = logger;
         }
 
-        public async Task<UpdateUserResponse> Handle(ActivateUserCommand command, CancellationToken cancellationToken)
+        public async Task<UpdateUserResponse> Handle(ActivateUserCommand command,
+            CancellationToken cancellationToken = default)
         {
             Guard.Against.Null(command, nameof(ActivateUserCommand));
 
@@ -31,14 +32,15 @@ namespace Pada.Modules.Identity.Application.Users.Features.Activation
                 throw new UserNotFoundException(command.UserId);
 
             user.ActivateUser();
-            var response =  await _userRepository.UpdateAsync(user);
+            var response = await _userRepository.UpdateAsync(user);
 
             _logger.LogInformation($"user with id '{user.Id}' activated successfully.");
 
-            return  response;
+            return response;
         }
 
-        public async Task<UpdateUserResponse> Handle(DeActivateUserCommand command, CancellationToken cancellationToken)
+        public async Task<UpdateUserResponse> Handle(DeActivateUserCommand command,
+            CancellationToken cancellationToken = default)
         {
             Guard.Against.Null(command, nameof(DeActivateUserCommand));
 
@@ -47,11 +49,11 @@ namespace Pada.Modules.Identity.Application.Users.Features.Activation
                 throw new UserNotFoundException(command.UserId);
 
             user.DeactivateUser();
-            var result =  await _userRepository.UpdateAsync(user);
-            
+            var result = await _userRepository.UpdateAsync(user);
+
             _logger.LogInformation($"user with id '{user.Id}' deactivated successfully.");
 
-            return  result;
+            return result;
         }
     }
 }

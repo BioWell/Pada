@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using AutoMapper;
-using Pada.Modules.Identity.Application.Users.Dtos.UseCaseResponses;
+using Pada.Modules.Identity.Application.Users.Dtos;
 using Pada.Modules.Identity.Domain.Aggregates.Users;
 
 namespace Pada.Modules.Identity.Application.Users.Mapping

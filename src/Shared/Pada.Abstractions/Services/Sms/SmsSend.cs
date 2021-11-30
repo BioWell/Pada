@@ -31,7 +31,7 @@ namespace Pada.Abstractions.Services.Sms
         /// <summary>
         /// 短信模板类型
         /// </summary>
-        public SmsTemplateType? TemplateType { get; set; }
+        public SmsTemplateType TemplateType { get; set; }
 
         /// <summary>
         /// 短信模板ID。请在控制台模板管理页面模板CODE一列查看。

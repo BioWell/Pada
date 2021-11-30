@@ -1,46 +1,42 @@
-﻿using System.Text.RegularExpressions;
-using FluentValidation;
+﻿using System;
+using System.Text.RegularExpressions;
 
 namespace Pada.Infrastructure.Utils
 {
     public static class ValidatorHelper
     {
-        const string patternEmail = @"\w[-\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\.)+[A-Za-z]{2,14}";
-        const string patternPhone = @"^\d{11}$";
+        private const string PatternEmail = @"\w[-\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\.)+[A-Za-z]{2,14}";
+        private const string PatternId = @"^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$";
+        private const string PatternPhone = @"^\d{11}$";
         
-        // public static IRuleBuilderOptions<T, bool> MatchPhoneNumberRule<T>(this IRuleBuilder<T, bool> ruleBuilder)
-        // {
-        //     return ruleBuilder.SetValidator(new Regex(patternEmail));
-        // }
-
-        public static (bool Succeeded, string Message) VerifyEmail(string input)
-        {
-            if (string.IsNullOrWhiteSpace(input))
-                return (false, "请输入邮箱地址");
-            var regex = new Regex(patternEmail);
-            if (!regex.IsMatch(input))
-                return (false, "邮箱地址格式错误");
-            return (true, "邮箱地址格式正确");
-        }
-        
-        public static (bool Succeeded, string Message) VerifyPhone(string input)
+        public static bool ValidEmail(string input)
         {
             if (string.IsNullOrWhiteSpace(input.Trim()))
-                return (false, "请输入手机号码");
-            var regex = new Regex(patternPhone);
+                return false;
+            var regex = new Regex(PatternEmail);
             if (!regex.IsMatch(input.Trim()))
-                return (false, "手机号格式错误");
-            return (true, "手机号格式正确");
+                return false;
+            return true;
         } 
         
         public static bool ValidPhone(string input)
         {
             if (string.IsNullOrWhiteSpace(input.Trim()))
                 return false;
-            var regex = new Regex(patternPhone);
+            var regex = new Regex(PatternPhone);
             if (!regex.IsMatch(input.Trim()))
                 return false;
             return true;
+        } 
+        
+        public static bool ValidId(Guid input)
+        {
+            Match match = Regex.Match(input.ToString(), PatternId, RegexOptions.IgnoreCase);
+            if (match.Success)
+            {
+                return true;
+            }
+            return false;
         } 
     }
 }

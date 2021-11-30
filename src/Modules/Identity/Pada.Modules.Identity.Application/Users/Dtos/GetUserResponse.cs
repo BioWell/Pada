@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using Pada.Infrastructure.Types;
-using Pada.Modules.Identity.Application.Users.Dtos.UseCaseResponses;
 
-namespace Pada.Modules.Identity.Application.Users.Dtos.GatewayResponses
+namespace Pada.Modules.Identity.Application.Users.Dtos
 {
     public class GetUserResponse : GatewayResponse<UserDto>
     {

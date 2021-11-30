@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Pada.Modules.Identity.Domain.Aggregates.Users.Types;
 
-namespace Pada.Modules.Identity.Application.Users.Dtos.UseCaseResponses
+namespace Pada.Modules.Identity.Application.Users.Dtos
 {
     public class UserDto
     {
