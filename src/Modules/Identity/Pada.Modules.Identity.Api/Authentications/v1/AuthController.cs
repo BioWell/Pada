@@ -6,6 +6,7 @@ using Pada.Modules.Identity.Api.Authentications.Models.Requests;
 using Pada.Modules.Identity.Application.Authentication.Dtos;
 using Pada.Modules.Identity.Application.Authentication.Features.Login;
 using Pada.Modules.Identity.Application.Authentication.Features.RefreshToken;
+using Pada.Modules.Identity.Application.Authentication.Features.RevokeToken;
 
 namespace Pada.Modules.Identity.Api.Authentications.v1
 {
@@ -33,6 +34,17 @@ namespace Pada.Modules.Identity.Api.Authentications.v1
             var refreshCommandResponse = await Mediator.Send(command);
         
             return Ok(refreshCommandResponse);
+        }
+        
+        // POST api/v1/auth/revoke-refresh-token
+        [HttpPost("revoke-refresh-token")]
+        [AllowAnonymous]
+        public async Task<ActionResult> RevokeRefreshToken(RevokeRefreshTokenRequest revokeTokenRequest)
+        {
+            var command = Mapper.Map<RevokeRefreshTokenCommand>(revokeTokenRequest);
+            await Mediator.Send(command);
+
+            return NoContent();
         }
     }
 }

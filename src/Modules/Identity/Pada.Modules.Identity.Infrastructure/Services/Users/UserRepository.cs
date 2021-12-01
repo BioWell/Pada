@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using EasyCaching.Core;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Pada.Abstractions.Auth;
 using Pada.Infrastructure.Caching;
@@ -19,7 +20,7 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
     public class UserRepository : IUserRepository
     {
         private string UserPrefix = "pada:user:";
-        
+
         private readonly CustomUserManager _userManager;
         private readonly AppIdentityDbContext _dbContext;
         private readonly IEasyCachingProvider _cachingProvider;
@@ -77,6 +78,14 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
 
             var appUser = await _userManager.FindByNameAsync(userNameOrEmail) ??
                           await _userManager.FindByEmailAsync(userNameOrEmail);
+
+            return appUser?.ToUser();
+        }
+
+        public async Task<User> FindByRefreshToken(string refreshToken)
+        {
+            var appUser = await _userManager.Users.Include(x => x.RefreshTokens)
+                .SingleOrDefaultAsync(u => u.RefreshTokens.Any(r => r.Token == refreshToken));
 
             return appUser?.ToUser();
         }
