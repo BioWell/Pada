@@ -10,6 +10,7 @@ using Pada.Modules.Identity.Application.Users.Features.Activation;
 using Pada.Modules.Identity.Application.Users.Features.GetUser;
 using Pada.Modules.Identity.Application.Users.Features.Lock;
 using Pada.Modules.Identity.Application.Users.Features.RegisterNewUser;
+using Pada.Modules.Identity.Domain;
 
 namespace Pada.Modules.Identity.Api.Users.V1
 {
@@ -114,6 +115,18 @@ namespace Pada.Modules.Identity.Api.Users.V1
         {
             var result = await Mediator.Send(new LockUserCommand(userId));
             return Ok(result);
+        }
+        
+        // POST api/v1/identity/users/{userId}/send-verification-email
+        [HttpPost("{userId}/send-verification-email")]
+        [Authorize(SecurityConstants.Permission.Security.VerifyEmail)]
+        public async Task<ActionResult> SendVerificationEmailAsync([FromRoute] string userId)
+        {
+            await Mediator.Send(new SendVerificationEmailCommand(userId, 
+                _httpContextAccessor.HttpContext?.Request.Scheme,
+                _httpContextAccessor.HttpContext?.Request.Host.Value));
+
+            return NoContent();
         }
     }
 }

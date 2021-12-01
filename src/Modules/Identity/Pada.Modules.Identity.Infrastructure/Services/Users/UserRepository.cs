@@ -19,8 +19,7 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
 {
     public class UserRepository : IUserRepository
     {
-        private string UserPrefix = "pada:user:";
-
+        // private string UserPrefix = "pada:user:";
         private readonly CustomUserManager _userManager;
         private readonly AppIdentityDbContext _dbContext;
         private readonly IEasyCachingProvider _cachingProvider;
@@ -109,6 +108,17 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
                 return new CheckPasswordResponse("user_not_found", $"User not found for userName: `{userName}`");
 
             return new CheckPasswordResponse(await _userManager.CheckPasswordAsync(appUser, password));
+        }
+        
+        public async Task<GenerateEmailConfirmationTokenResponse> GenerateEmailConfirmationTokenAsync(string userId)
+        {
+            var appUser = await _userManager.FindByIdAsync(userId);
+            if (appUser is null)
+                return new GenerateEmailConfirmationTokenResponse("user_not_found", $"User not found for userId: `{userId}`");
+
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(appUser);
+
+            return new GenerateEmailConfirmationTokenResponse(token);
         }
 
         public async Task<(IList<Claim> UserClaims, IList<string> Roles, IList<string> PermissionClaims)>
