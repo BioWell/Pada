@@ -6,7 +6,7 @@ namespace Pada.Modules.Identity.Application.Authentication.Exceptions
     {
         public PasswordIsInvalidException() : base("password is invalid!")
         {
-            Code = "password";
+            Code = "Password";
         }
     }
 }

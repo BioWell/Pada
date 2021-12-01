@@ -12,13 +12,14 @@ using Pada.Infrastructure.Caching;
 using Pada.Modules.Identity.Application.Users.Contracts;
 using Pada.Modules.Identity.Application.Users.Dtos;
 using Pada.Modules.Identity.Domain.Aggregates.Users;
-using Pada.Modules.Identity.Infrastructure.Aggregates.Users;
 using Pada.Modules.Identity.Infrastructure.Persistence;
 
 namespace Pada.Modules.Identity.Infrastructure.Services.Users
 {
     public class UserRepository : IUserRepository
     {
+        private string UserPrefix = "pada:user:";
+        
         private readonly CustomUserManager _userManager;
         private readonly AppIdentityDbContext _dbContext;
         private readonly IEasyCachingProvider _cachingProvider;
@@ -187,13 +188,5 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
         {
             await _cachingProvider.RemoveAsync(key);
         }
-
-        // private async Task InvalidateUserCache(AppUser appUser)
-        // {
-        //     await InvalidateCache(CacheKey.With(nameof(FindByIdAsync), Guid.Parse(appUser.Id).ToString()));
-        //     await InvalidateCache(CacheKey.With(nameof(FindByEmailAsync), appUser.Email));
-        //     await InvalidateCache(CacheKey.With(nameof(FindByNameAsync), appUser.UserName));
-        //     await InvalidateCache(CacheKey.With(nameof(FindByPhoneAsync), appUser.PhoneNumber));
-        // }
     }
 }

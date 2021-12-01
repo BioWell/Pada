@@ -14,7 +14,7 @@ using Pada.Modules.Identity.Application.Users.Exceptions;
 
 namespace Pada.Modules.Identity.Application.Authentication.Features.Login
 {
-    public class LoginCommandHandler : IRequestHandler<LoginCommand, LoginCommandResponse>
+    public class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResponse>
     {
         private readonly IUserRepository _userRepository;
         private readonly ILogger<LoginCommandHandler> _logger;
@@ -34,7 +34,7 @@ namespace Pada.Modules.Identity.Application.Authentication.Features.Login
             _tokenStorageService = tokenStorageService;
         }
 
-        public async Task<LoginCommandResponse> Handle(LoginCommand command,
+        public async Task<LoginResponse> Handle(LoginCommand command,
             CancellationToken cancellationToken = default)
         {
             Guard.Against.Null(command, nameof(LoginCommand));
@@ -55,8 +55,8 @@ namespace Pada.Modules.Identity.Application.Authentication.Features.Login
             if (!user.IsActive)
                 throw new UserInactiveException(command.UserNameOrEmail);
 
-            // if (user.EmailConfirmed == false)
-            //     throw new EmailNotConfirmedException(user.Email);
+            if (user.EmailConfirmed == false)
+                throw new EmailNotConfirmedException(user.Email);
 
             // authentication successful so generate jwt and refresh tokens
             var allClaims = await _userRepository.GetClaimsAsync(user.UserName);
@@ -87,7 +87,7 @@ namespace Pada.Modules.Identity.Application.Authentication.Features.Login
             //     jsonWebToken));
 
             // we can don't return value from command and get token from a short term session in our request with `TokenStorageService`
-            return new LoginCommandResponse(new LoginResponse(user, jsonWebToken, newRefreshToken.Token));
+            return new LoginResponse(new LoginDto(user, jsonWebToken, newRefreshToken.Token));
         }
     }
 }

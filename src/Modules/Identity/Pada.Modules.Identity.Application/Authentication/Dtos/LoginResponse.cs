@@ -1,25 +1,21 @@
-﻿using System;
-using Pada.Abstractions.Auth;
-using Pada.Modules.Identity.Domain.Aggregates.Users;
+﻿using System.Collections.Generic;
+using Pada.Infrastructure.Types;
 
 namespace Pada.Modules.Identity.Application.Authentication.Dtos
 {
-    public class LoginResponse
+    public class LoginResponse : GatewayResponse<LoginDto>
     {
-        public LoginResponse(User user,AppJsonWebToken jwtToken, string refreshToken)
+        public LoginResponse(LoginDto data, bool isSuccess = true,
+            IDictionary<string, string[]> errors = default) : base(data, isSuccess, errors)
         {
-            FirstName = user.FirstName;
-            LastName = user.LastName;
-            Username = user.UserName;
-            JsonWebToken = jwtToken;
-            RefreshToken = refreshToken;
         }
-        
-        public string FirstName { get; }
-        public string LastName { get; }
-        public string Username { get; }
-        
-        public AppJsonWebToken JsonWebToken { get; }
-        public string RefreshToken { get; }
+
+        public LoginResponse(IDictionary<string, string[]> errors) : base(errors)
+        {
+        }
+
+        public LoginResponse(string code, string error) : base(code, error)
+        {
+        }
     }
 }

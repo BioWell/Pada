@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Pada.Abstractions.Auth;
 using Pada.Abstractions.Domain.Types;
+using Pada.Infrastructure.Utils;
 using Pada.Modules.Identity.Domain.Aggregates.Users.Types;
 
 namespace Pada.Modules.Identity.Domain.Aggregates.Users
@@ -57,14 +58,15 @@ namespace Pada.Modules.Identity.Domain.Aggregates.Users
             CreatedDate = createdDate ?? DateTime.Now;
             CreatedBy = createdBy;
             ModifiedBy = modifiedBy;
-            ModifiedDate = modifiedDate?? DateTime.Now;;
+            ModifiedDate = modifiedDate ?? DateTime.Now;
+            ;
         }
 
         private User()
         {
             // Only for deserialization 
         }
-        
+
         public static User Create(UserId id,
             string email,
             string firstName,
@@ -97,7 +99,7 @@ namespace Pada.Modules.Identity.Domain.Aggregates.Users
                 modifiedDate)
             {
             };
-            
+
             user.SetPersonalInformation(firstName, lastName, name.Trim(), email?.ToLowerInvariant(), phoneNumber,
                 photoUrl);
             user.SetUserName(userName);
@@ -105,7 +107,7 @@ namespace Pada.Modules.Identity.Domain.Aggregates.Users
             user.SetUserType(userType);
             return user;
         }
-        
+
         private void SetPersonalInformation(string firstName, string lastName,
             string name, string email, string phoneNumber, string photoUrl)
         {
@@ -116,55 +118,83 @@ namespace Pada.Modules.Identity.Domain.Aggregates.Users
             PhotoUrl = photoUrl;
             Email = email;
         }
-        
+
         private void SetUserName(string userName)
         {
             UserName = userName;
         }
-        
+
         private void SetStatus(string status)
         {
             if (string.IsNullOrEmpty(status))
                 return;
             Status = status;
         }
-        
+
         private void SetUserType(UserType userType)
         {
             UserType = userType;
         }
-        
+
         public void ChangePermissions(IList<AppPermission> permissions)
         {
             if (permissions is null)
                 return;
             _permissions = permissions.ToList();
         }
-        
+
         public void ChangeRoles(IList<Role> roles)
         {
             if (roles is null)
                 return;
             _roles = roles.ToList();
         }
-        
+
         public void ChangeRefreshTokens(IList<AppRefreshToken> refreshTokens)
         {
             if (refreshTokens is null)
                 return;
             _refreshTokens = refreshTokens.ToList();
         }
-        
+
         public void ActivateUser()
         {
             IsActive = true;
         }
-        
+
         public void DeactivateUser()
         {
             IsActive = false;
         }
+
+        public bool HasValidRefreshToken(string token)
+        {
+            return _refreshTokens.Any(refreshToken => 
+                refreshToken.Token == token && IsRefreshTokenValid(refreshToken));
+        }
         
+        public void RevokeRefreshToken(AppRefreshToken refreshToken, string ip = null)
+        {
+            refreshToken.RevokedOn = DateTime.Now;
+            refreshToken.RevokedByIp = ip ?? IpHelper.GetIpAddress();
+        }
+        
+        public void RevokeDescendantRefreshTokens(AppRefreshToken refreshToken, string ip = null)
+        {
+            // recursively traverse the refresh token chain and ensure all descendants are revoked
+            if (!string.IsNullOrEmpty(refreshToken.Token))
+            {
+                var childToken = _refreshTokens.SingleOrDefault(x => x.Token == refreshToken.Token);
+                if (childToken == null)
+                    return;
+
+                if (childToken.IsActive)
+                    RevokeRefreshToken(childToken, ip ?? IpHelper.GetIpAddress());
+                else
+                    RevokeDescendantRefreshTokens(childToken, ip ?? IpHelper.GetIpAddress());
+            }
+        }
+
         public bool IsRefreshTokenValid(AppRefreshToken existingToken, double? ttlRefreshToken = null)
         {
             // Token already expired or revoked, then return false
@@ -173,14 +203,14 @@ namespace Pada.Modules.Identity.Domain.Aggregates.Users
                 return false;
             }
 
-            if (ttlRefreshToken is not null && existingToken.CreatedOn.AddDays((long)ttlRefreshToken) <= DateTime.Now)
+            if (ttlRefreshToken is not null && existingToken.CreatedOn.AddDays((long) ttlRefreshToken) <= DateTime.Now)
             {
                 return false;
             }
 
             return true;
         }
-        
+
         public void RemoveOldRefreshTokens(long? ttlRefreshToken = null)
         {
             _refreshTokens.RemoveAll(x => IsRefreshTokenValid(x, ttlRefreshToken) == false);

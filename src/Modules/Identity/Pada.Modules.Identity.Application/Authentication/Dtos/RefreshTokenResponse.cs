@@ -1,16 +1,21 @@
-﻿using Microsoft.IdentityModel.JsonWebTokens;
-using Pada.Abstractions.Auth;
+﻿using System.Collections.Generic;
+using Pada.Infrastructure.Types;
 
 namespace Pada.Modules.Identity.Application.Authentication.Dtos
 {
-    public class RefreshTokenResponse
+    public class RefreshTokenResponse : GatewayResponse<RefreshTokenDto>
     {
-        public RefreshTokenResponse(AppJsonWebToken jwtToken, string refreshToken)
+        public RefreshTokenResponse(RefreshTokenDto data, bool isSuccess = true,
+            IDictionary<string, string[]> errors = default) : base(data, isSuccess, errors)
         {
-            JsonWebToken = jwtToken;
-            RefreshToken = refreshToken;
         }
-        public AppJsonWebToken JsonWebToken { get; }
-        public string RefreshToken { get; }
+
+        public RefreshTokenResponse(IDictionary<string, string[]> errors) : base(errors)
+        {
+        }
+
+        public RefreshTokenResponse(string code, string error) : base(code, error)
+        {
+        }
     }
 }

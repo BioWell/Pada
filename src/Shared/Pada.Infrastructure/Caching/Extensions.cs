@@ -14,7 +14,7 @@ namespace Pada.Infrastructure.Caching
             services.AddEasyCaching(options =>
             {
                 options.UseInMemory(configuration, "mem");
-                options.UseRedis(configuration, "redis").WithMessagePack();
+                // options.UseRedis(configuration, "redis").WithMessagePack();
             });
             
             services.AddSingleton<IRequestStorage, RequestStorage>();

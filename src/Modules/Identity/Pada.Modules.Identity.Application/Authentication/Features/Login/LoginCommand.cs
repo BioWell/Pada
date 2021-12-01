@@ -4,7 +4,7 @@ using Pada.Modules.Identity.Application.Authentication.Dtos;
 
 namespace Pada.Modules.Identity.Application.Authentication.Features.Login
 {
-    public class LoginCommand: IRequest<LoginCommandResponse>
+    public class LoginCommand: IRequest<LoginResponse>
     {
         public LoginCommand(string userNameOrEmail, string password, bool remember)
         {
