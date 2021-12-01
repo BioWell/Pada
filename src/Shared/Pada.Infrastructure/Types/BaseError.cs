@@ -6,17 +6,21 @@ namespace Pada.Infrastructure.Types
     {
         public IDictionary<string, string[]> Errors { get; } = new Dictionary<string, string[]>();
 
+        public string Code { get; set; } = "pada";
+
         public BaseError(string code, string error)
         {
-            Errors.Add(code, new[] {error});
+            Code = code;
+            Errors.Add(Code, new[] {error});
         }
 
         public BaseError(string code, string[] errors)
         {
-            Errors.Add(code, errors);
+            Code = code;
+            Errors.Add(Code, errors);
         }
-        
-        public BaseError(IDictionary<string, string[]> errors )
+
+        public BaseError(IDictionary<string, string[]> errors)
         {
             Errors = errors;
         }

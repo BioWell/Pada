@@ -164,5 +164,26 @@ namespace Pada.Modules.Identity.Domain.Aggregates.Users
         {
             IsActive = false;
         }
+        
+        public bool IsRefreshTokenValid(AppRefreshToken existingToken, double? ttlRefreshToken = null)
+        {
+            // Token already expired or revoked, then return false
+            if (existingToken.IsActive == false)
+            {
+                return false;
+            }
+
+            if (ttlRefreshToken is not null && existingToken.CreatedOn.AddDays((long)ttlRefreshToken) <= DateTime.Now)
+            {
+                return false;
+            }
+
+            return true;
+        }
+        
+        public void RemoveOldRefreshTokens(long? ttlRefreshToken = null)
+        {
+            _refreshTokens.RemoveAll(x => IsRefreshTokenValid(x, ttlRefreshToken) == false);
+        }
     }
 }

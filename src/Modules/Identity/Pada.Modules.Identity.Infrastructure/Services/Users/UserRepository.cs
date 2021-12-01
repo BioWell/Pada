@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
 using EasyCaching.Core;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
+using Pada.Abstractions.Auth;
 using Pada.Infrastructure.Caching;
 using Pada.Modules.Identity.Application.Users.Contracts;
 using Pada.Modules.Identity.Application.Users.Dtos;
@@ -66,7 +69,7 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
             var appUser = _dbContext.Users.FirstOrDefault(c => c.PhoneNumber == phone);
             return appUser?.ToUser();
         }
-        
+
         public async Task<User> FindByNameOrEmailAsync(string userNameOrEmail, bool invalidateCache = false)
         {
             if (invalidateCache) await InvalidateCache(CacheKey.With(nameof(FindByNameOrEmailAsync), userNameOrEmail));
@@ -75,6 +78,44 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
                           await _userManager.FindByEmailAsync(userNameOrEmail);
 
             return appUser?.ToUser();
+        }
+
+        public async Task<(User, bool)> IsUserLockedAsync(string userNameOrEmail)
+        {
+            var appUser = await _userManager.FindByNameAsync(userNameOrEmail) ??
+                          await _userManager.FindByEmailAsync(userNameOrEmail);
+
+            if (appUser is null) return (null, false);
+
+            var isLocked = await _userManager.IsLockedOutAsync(appUser);
+
+            return (appUser?.ToUser(), isLocked);
+        }
+
+        public async Task<CheckPasswordResponse> CheckPassword(string userName, string password)
+        {
+            var appUser = await _userManager.FindByNameAsync(userName);
+            if (appUser is null)
+                return new CheckPasswordResponse("user_not_found", $"User not found for userName: `{userName}`");
+
+            return new CheckPasswordResponse(await _userManager.CheckPasswordAsync(appUser, password));
+        }
+
+        public async Task<(IList<Claim> UserClaims, IList<string> Roles, IList<string> PermissionClaims)>
+            GetClaimsAsync(string userName)
+        {
+            var appUser = await _userManager.FindByNameAsync(userName);
+            var userClaims =
+                (await _userManager.GetClaimsAsync(appUser))
+                .Where(x => x.Type != CustomClaimTypes.Permission)
+                .ToList();
+            var roles = (await _userManager.GetRolesAsync(appUser));
+            var permissions = (await _userManager.GetClaimsAsync(appUser))
+                .Where(x => x.Type == CustomClaimTypes.Permission)?
+                .Select(x => x.Value)
+                .ToList();
+
+            return (UserClaims: userClaims, Roles: roles, PermissionClaims: permissions);
         }
 
         public bool IsPhoneUsedAsync(string phone)
@@ -110,8 +151,8 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
             var appUser = user.ToApplicationUser();
             IdentityResult identityResult = await _userManager.UpdateAsync(appUser);
 
-            if (identityResult.Succeeded)
-                await InvalidateUserCache(appUser);
+            // if (identityResult.Succeeded)
+            //     await InvalidateUserCache(appUser);
 
             return new UpdateUserResponse(appUser.ToUserId(),
                 identityResult.Succeeded,
@@ -147,12 +188,12 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
             await _cachingProvider.RemoveAsync(key);
         }
 
-        private async Task InvalidateUserCache(AppUser appUser)
-        {
-            await InvalidateCache(CacheKey.With(nameof(FindByIdAsync), Guid.Parse(appUser.Id).ToString()));
-            await InvalidateCache(CacheKey.With(nameof(FindByEmailAsync), appUser.Email));
-            await InvalidateCache(CacheKey.With(nameof(FindByNameAsync), appUser.UserName));
-            await InvalidateCache(CacheKey.With(nameof(FindByPhoneAsync), appUser.PhoneNumber));
-        }
+        // private async Task InvalidateUserCache(AppUser appUser)
+        // {
+        //     await InvalidateCache(CacheKey.With(nameof(FindByIdAsync), Guid.Parse(appUser.Id).ToString()));
+        //     await InvalidateCache(CacheKey.With(nameof(FindByEmailAsync), appUser.Email));
+        //     await InvalidateCache(CacheKey.With(nameof(FindByNameAsync), appUser.UserName));
+        //     await InvalidateCache(CacheKey.With(nameof(FindByPhoneAsync), appUser.PhoneNumber));
+        // }
     }
 }

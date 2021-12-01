@@ -174,6 +174,12 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
             user.Patch(existentUser);
 
             var result = await base.UpdateUserAsync(existentUser);
+            
+            // if (result == IdentityResult.Success)
+            // {
+            //     var cacheKey = CacheKey.With(GetType(), nameof(FindByIdAsync), user.Id);
+            //     await _cachingProvider.RemoveAsync(cacheKey);
+            // }
 
             return result;
         }

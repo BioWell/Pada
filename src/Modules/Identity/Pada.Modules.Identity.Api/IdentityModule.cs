@@ -1,11 +1,17 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Pada.Abstractions.Auth;
 using Pada.Abstractions.Modules;
+using Pada.Infrastructure.Auth;
 using Pada.Modules.Identity.Application;
+using Pada.Modules.Identity.Domain.Aggregates.Users;
 using Pada.Modules.Identity.Infrastructure;
 
 namespace Pada.Modules.Identity.Api
@@ -25,6 +31,11 @@ namespace Pada.Modules.Identity.Api
         public void Register(IServiceCollection services)
         {
             services.AddIdentityInfrastructure(Configuration, Name);
+            services.AddCustomJwtAuthentication(Configuration, 
+                GetClaimPolicies(), 
+                GetRolePolicies(),
+                TokenStorageType.InMemory,
+                nameof(JwtOptions));
             services.AddIdentityApplication();
         }
 
@@ -36,6 +47,27 @@ namespace Pada.Modules.Identity.Api
         {
             endpoints.MapGet(Path, ctx => ctx.Response.WriteAsync($"{Name} module"));
             endpoints.MapGet($"{Path}/ping", ctx => ctx.Response.WriteAsJsonAsync(true));
+        }
+        
+        private IList<ClaimPolicy> GetClaimPolicies()
+        {
+            return AppPermission.GetAllPermissions().Select(x => new ClaimPolicy
+            {
+                Name = x.Name,
+                Claims = new List<Claim>
+                {
+                    new Claim(CustomClaimTypes.Permission, x.Name)
+                }
+            }).ToList();
+        }
+        
+        private IList<RolePolicy> GetRolePolicies()
+        {
+            return Role.AllRoles().Select(x => new RolePolicy()
+            {
+                Name = x.Name,
+                Roles = new List<string> { x.Name }
+            }).ToList();
         }
     }
 }

@@ -12,7 +12,6 @@
 
     <ItemGroup>
       <Folder Include="Authentication\Contracts" />
-      <Folder Include="Authentication\Exceptions" />
       <Folder Include="Authentication\Mappings" />
     </ItemGroup>
 

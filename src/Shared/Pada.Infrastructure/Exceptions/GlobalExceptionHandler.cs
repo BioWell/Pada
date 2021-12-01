@@ -93,6 +93,20 @@ namespace Pada.Infrastructure.Exceptions
                             false,
                             error.Errors);
                         break;
+                    case IdentityAccessException e:
+                        response.StatusCode = StatusCodes.Status403Forbidden;
+                        error = new BaseError(e.Code, e.AppMessage);
+                        responseModel = new ResultModel<string>("Access exception",
+                            false,
+                            error.Errors);
+                        break;
+                    case IdentityException e:
+                        response.StatusCode = StatusCodes.Status401Unauthorized;
+                        error = new BaseError(e.Code, e.AppMessage);
+                        responseModel = new ResultModel<string>("Authorization exception",
+                            false,
+                            error.Errors);
+                        break;
                     default:
                         response.StatusCode = StatusCodes.Status500InternalServerError;
                         error = new BaseError("System", "Internal server");
