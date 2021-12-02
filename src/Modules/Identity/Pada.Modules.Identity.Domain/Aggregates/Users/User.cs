@@ -104,7 +104,7 @@ namespace Pada.Modules.Identity.Domain.Aggregates.Users
             };
 
             user.SetPersonalInformation(firstName, lastName, name.Trim(), email?.ToLowerInvariant(), phoneNumber,
-                photoUrl);
+                photoUrl, false);
             user.SetUserName(userName);
             user.SetStatus(status);
             user.SetUserType(userType);
@@ -191,13 +191,13 @@ namespace Pada.Modules.Identity.Domain.Aggregates.Users
         public void ChangePersonalInformation(string firstName, string lastName,
             string name, string email, string phoneNumber, string photoUrl)
         {
-            SetPersonalInformation(firstName, lastName, name, email, phoneNumber, photoUrl);
+            SetPersonalInformation(firstName, lastName, name, email, phoneNumber, photoUrl, true);
             IncrementVersion();
             AddDomainEvent(new PersonalInformationChangedDomainEvent(this));
         }
 
         private void SetPersonalInformation(string firstName, string lastName,
-            string name, string email, string phoneNumber, string photoUrl)
+            string name, string email, string phoneNumber, string photoUrl, bool addDomain)
         {
             FirstName = firstName;
             LastName = lastName;
@@ -205,28 +205,39 @@ namespace Pada.Modules.Identity.Domain.Aggregates.Users
             PhoneNumber = phoneNumber;
             PhotoUrl = photoUrl;
             Email = email;
-            IncrementVersion();
-            AddDomainEvent(new PersonalInformationChangedDomainEvent(this));
+
+            if (addDomain)
+            {
+                IncrementVersion();
+                AddDomainEvent(new PersonalInformationChangedDomainEvent(this));
+            }
         }
 
         #region Domain Operations
 
-        public void ChangeRoles(IList<Role> roles)
+        public void ChangeRoles(IList<Role> roles, bool addDomain)
         {
             if (roles is null)
                 return;
             _roles = roles.ToList();
-            IncrementVersion();
-            AddDomainEvent(new RolesChangedDomainEvent(Id, _roles));
+            if (addDomain)
+            {
+                IncrementVersion();
+                AddDomainEvent(new RolesChangedDomainEvent(Id, _roles));
+            }
         }
 
-        public void ChangePermissions(IList<AppPermission> permissions)
+        public void ChangePermissions(IList<AppPermission> permissions, bool addDomain)
         {
             if (permissions is null)
                 return;
             _permissions = permissions.ToList();
-            IncrementVersion();
-            AddDomainEvent(new PermissionChangedDomainEvent(Id, _permissions));
+
+            if (addDomain)
+            {
+                IncrementVersion();
+                AddDomainEvent(new PermissionChangedDomainEvent(Id, _permissions));
+            }
         }
 
         public void ChangeRefreshTokens(IList<AppRefreshToken> refreshTokens)

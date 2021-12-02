@@ -24,18 +24,21 @@ namespace Pada.Modules.Identity.Application.Users.Features.RegisterNewUser
         private readonly ISmsSender _smsSender;
         private readonly RegistrationOptions _registrationOptions;
         private readonly ICustomMailService _mailService;
+        private readonly IAppIdentityDbContext _identityDbContext;
 
         public RegisterNewUserCommandHandler(IUserRepository userRepository,
             ILogger<RegisterNewUserCommandHandler> logger,
             RegistrationOptions registrationOptions,
-            ISmsSender smsSender, 
-            ICustomMailService mailService)
+            ISmsSender smsSender,
+            ICustomMailService mailService,
+            IAppIdentityDbContext identityDbContext)
         {
             _userRepository = userRepository;
             _logger = logger;
             _registrationOptions = registrationOptions;
             _smsSender = smsSender;
             _mailService = mailService;
+            _identityDbContext = identityDbContext;
         }
 
         public async Task<Unit> Handle(RegisterNewUserCommand command,
@@ -85,21 +88,21 @@ namespace Pada.Modules.Identity.Application.Users.Features.RegisterNewUser
                 command.PhotoUrl,
                 command.Status);
 
-            user.ChangePermissions(command.Permissions?.Select(x => AppPermission.Of(x, "")).ToArray());
-            user.ChangeRoles(command.Roles?.Select(x => Role.Of(x, x)).ToArray());
+            user.ChangePermissions(command.Permissions?.Select(x => AppPermission.Of(x, "")).ToArray(), false);
+            user.ChangeRoles(command.Roles?.Select(x => Role.Of(x, x)).ToArray(), false);
 
-            var result = await _userRepository.AddAsync(user);
-            if (result.IsSuccess == false)
-                throw new RegisterNewUserFailedException(user.Name);
-            _logger.LogInformation("Created an account for the user with ID: '{Id}'.", user.Id);
+            // var result = await _userRepository.AddAsync(user);
+            // if (result.IsSuccess == false)
+            //     throw new RegisterNewUserFailedException(user.Name);
+            // _logger.LogInformation("Created an account for the user with ID: '{Id}'.", user.Id);
 
-            //Option1: Using our transactional middleware for publishing domain events and integration events automatically
-            //Option 2: Explicit calling domain events
-            // await _userRepository.AddAsync(user);
-            // await UnitOfWork.CommitAsync(); // will dispatch or domain events and domain event notifications
-
-            // user.ChangePermissions(command.Permissions?.Select(x => Permission.Of(x, "")).ToArray());
-            // user.ChangeRoles(command.Roles?.Select(x => Role.Of(x, x)).ToArray());
+            await _identityDbContext.HandleTransactionAsync(beforeCommitHandler: async () =>
+            {
+                var result = await _userRepository.AddAsync(user);
+                if (result.IsSuccess == false)
+                    throw new RegisterNewUserFailedException(user.UserName);
+                _logger.LogInformation("Created an account for the user with ID: '{Id}'.", user.Id);
+            }, events: user.Events.ToList());
 
             return Unit.Value;
         }

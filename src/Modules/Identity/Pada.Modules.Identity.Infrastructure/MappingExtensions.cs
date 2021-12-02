@@ -38,8 +38,8 @@ namespace Pada.Modules.Identity.Infrastructure
                 appUser.CreatedDate, 
                 appUser.ModifiedBy,
                 appUser.ModifiedDate);
-            user.ChangePermissions(permissions);
-            user.ChangeRoles(roles);
+            user.ChangePermissions(permissions,false);
+            user.ChangeRoles(roles,false);
             user.ChangeRefreshTokens(refreshTokens?.ToArray());
             return user;
         }

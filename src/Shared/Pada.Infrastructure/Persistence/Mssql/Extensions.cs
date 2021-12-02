@@ -13,8 +13,6 @@ namespace Pada.Infrastructure.Persistence.Mssql
             string connection)
             where TContext : DbContext, ISqlDbContext, IDbFacadeResolver //, IDomainEventContext
         {
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
-            
             if (string.IsNullOrWhiteSpace(connection)) throw new CoreException($"{connection} cannot be null");
 
             services.AddDbContext<TContext>(options =>

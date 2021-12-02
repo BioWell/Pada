@@ -276,7 +276,7 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
         public override async Task<IdentityResult> CreateAsync(AppUser user)
         {
             var userResult = await base.CreateAsync(user);
-            userResult.LogResult($"a new user with userId '{user.Id}' added successfully.");
+
             if (userResult.Succeeded)
             {
                 var permissions = user.Permissions;
