@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Pada.Infrastructure.Exceptions
+namespace Pada.Abstractions.Exceptions
 {
     public class CustomException : Exception
     {

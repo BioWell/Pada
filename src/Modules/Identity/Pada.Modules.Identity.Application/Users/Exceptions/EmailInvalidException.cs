@@ -2,7 +2,7 @@
 
 namespace Pada.Modules.Identity.Application.Users.Exceptions
 {
-    public class EmailInvalidException: AppException
+    public class EmailInvalidException : AppException
     {
         public string Email { get; }
 

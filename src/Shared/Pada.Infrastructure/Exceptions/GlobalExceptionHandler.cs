@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using Pada.Abstractions.Domain.Types;
+using Pada.Abstractions.Exceptions;
 using Pada.Infrastructure.Types;
 using Pada.Infrastructure.Validations;
 
@@ -104,6 +106,13 @@ namespace Pada.Infrastructure.Exceptions
                         response.StatusCode = StatusCodes.Status401Unauthorized;
                         error = new BaseError(e.Code, e.AppMessage);
                         responseModel = new ResultModel<string>("Authorization exception",
+                            false,
+                            error.Errors);
+                        break;
+                    case BusinessRuleException e:
+                        response.StatusCode = StatusCodes.Status400BadRequest;
+                        error = new BaseError(e.Code, e.AppMessage);
+                        responseModel = new ResultModel<string>("BusinessRule exception",
                             false,
                             error.Errors);
                         break;

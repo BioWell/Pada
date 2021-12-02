@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Pada.Abstractions.Exceptions;
 
 namespace Pada.Abstractions.Domain.Types
 {

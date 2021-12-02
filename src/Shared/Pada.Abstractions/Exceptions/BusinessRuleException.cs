@@ -1,12 +1,13 @@
-﻿using System;
+﻿using Pada.Abstractions.Domain;
 
-namespace Pada.Abstractions.Domain.Types
+namespace Pada.Abstractions.Exceptions
 {
-    public class BusinessRuleException : Exception
+    public class BusinessRuleException : CustomException
     {
         public BusinessRuleException(IBusinessRule brokenRule)
             : base(brokenRule.Message)
         {
+            Code = nameof(BrokenRule);
             BrokenRule = brokenRule;
             Details = brokenRule.Message;
         }
