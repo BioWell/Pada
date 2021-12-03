@@ -5,11 +5,11 @@ namespace Pada.Modules.Identity.Domain.Aggregates.Users.DomainEvents
 {
     public class UserMarkedAsAdminDomainEvent : DomainEventBase
     {
+        public UserId UserId { get; }
+
         public UserMarkedAsAdminDomainEvent(UserId userId)
         {
             UserId = userId;
         }
-
-        public UserId UserId { get; }
     }
 }

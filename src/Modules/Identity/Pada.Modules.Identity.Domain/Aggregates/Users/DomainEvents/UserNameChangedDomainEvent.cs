@@ -5,12 +5,13 @@ namespace Pada.Modules.Identity.Domain.Aggregates.Users.DomainEvents
 {
     public class UserNameChangedDomainEvent : DomainEventBase
     {
-        public UserNameChangedDomainEvent(UserId userId,string newUserName)
+        public UserId UserId { get; }
+        public string NewUserName { get; }
+
+        public UserNameChangedDomainEvent(UserId userId, string newUserName)
         {
             UserId = userId;
             NewUserName = newUserName;
         }
-        public UserId UserId { get; }
-        public string NewUserName { get; }
     }
 }

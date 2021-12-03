@@ -20,6 +20,7 @@ namespace Pada.Modules.Identity.Application.Users.Contracts
         Task<CheckPasswordResponse> CheckPassword(string userName, string password);
         Task<(IList<Claim> UserClaims, IList<string> Roles, IList<string> PermissionClaims)> GetClaimsAsync(string userName);
         Task<GenerateEmailConfirmationTokenResponse> GenerateEmailConfirmationTokenAsync(string userId);
+        Task<ConfirmEmailResponse> ConfirmEmailAsync(string userId, string verificationCode);
         bool IsPhoneUsedAsync(string id);
         public Task<(User, bool)> IsUserLockedAsync(string userNameOrEmail);
         

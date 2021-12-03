@@ -109,12 +109,13 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
 
             return new CheckPasswordResponse(await _userManager.CheckPasswordAsync(appUser, password));
         }
-        
+
         public async Task<GenerateEmailConfirmationTokenResponse> GenerateEmailConfirmationTokenAsync(string userId)
         {
             var appUser = await _userManager.FindByIdAsync(userId);
             if (appUser is null)
-                return new GenerateEmailConfirmationTokenResponse("user_not_found", $"User not found for userId: `{userId}`");
+                return new GenerateEmailConfirmationTokenResponse("user_not_found",
+                    $"User not found for userId: `{userId}`");
 
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(appUser);
 
@@ -136,6 +137,21 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
                 .ToList();
 
             return (UserClaims: userClaims, Roles: roles, PermissionClaims: permissions);
+        }
+
+        public async Task<ConfirmEmailResponse> ConfirmEmailAsync(string userId, string verificationCode)
+        {
+            var appUser = await _userManager.FindByIdAsync(userId);
+            if (appUser is null)
+                return new ConfirmEmailResponse("user_not_found", $"User not found for userId: `{userId}`");
+
+            var identityResult = await _userManager.ConfirmEmailAsync(appUser, verificationCode);
+
+            return new ConfirmEmailResponse(appUser.ToUser(),
+                identityResult.Succeeded,
+                identityResult.Errors
+                    .Distinct()
+                    .ToDictionary(x => x.Code, x => new string[] {x.Description}));
         }
 
         public bool IsPhoneUsedAsync(string phone)

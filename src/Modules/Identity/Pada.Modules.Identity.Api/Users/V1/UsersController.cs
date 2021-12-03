@@ -38,7 +38,7 @@ namespace Pada.Modules.Identity.Api.Users.V1
             var name = nameof(GetUserByIdAsync);
             return CreatedAtRoute(name, new {id = command.Id}, command);
         }
-        
+
         // POST api/v1/identity/users/RegisterByPhone
         [HttpPost("RegisterByPhone")]
         [AllowAnonymous]
@@ -59,7 +59,7 @@ namespace Pada.Modules.Identity.Api.Users.V1
 
             return Ok(result);
         }
-        
+
         // GET api/v1/identity/users/email/{email}
         [HttpGet("email/{email}", Name = nameof(GetUserByEmailAsync))]
         [AllowAnonymous]
@@ -69,7 +69,7 @@ namespace Pada.Modules.Identity.Api.Users.V1
 
             return Ok(result);
         }
-        
+
         // GET api/v1/identity/users/UserName/{UserName}
         [HttpGet("UserName/{UserName}", Name = nameof(GetUserByNameAsync))]
         [AllowAnonymous]
@@ -79,7 +79,7 @@ namespace Pada.Modules.Identity.Api.Users.V1
 
             return Ok(result);
         }
-        
+
         // GET api/v1/identity/users/Phone/{phone}
         [HttpGet("Phone/{phone}", Name = nameof(FindByPhoneAsync))]
         [AllowAnonymous]
@@ -98,7 +98,7 @@ namespace Pada.Modules.Identity.Api.Users.V1
             var result = await Mediator.Send(new ActivateUserCommand(request.UserId));
             return Ok(result);
         }
-        
+
         // Put api/v1/identity/users/deactive-user
         [HttpPut("deactive-user")]
         [AllowAnonymous]
@@ -107,7 +107,7 @@ namespace Pada.Modules.Identity.Api.Users.V1
             var result = await Mediator.Send(new DeActivateUserCommand(request.UserId));
             return Ok(result);
         }
-        
+
         // POST api/v1/identity/users/{userId}/lock-user
         [HttpPost("{userId}/lock-user")]
         [AllowAnonymous]
@@ -116,15 +116,25 @@ namespace Pada.Modules.Identity.Api.Users.V1
             var result = await Mediator.Send(new LockUserCommand(userId));
             return Ok(result);
         }
-        
+
         // POST api/v1/identity/users/{userId}/send-verification-email
         [HttpPost("{userId}/send-verification-email")]
         [Authorize(SecurityConstants.Permission.Security.VerifyEmail)]
         public async Task<ActionResult> SendVerificationEmailAsync([FromRoute] string userId)
         {
-            await Mediator.Send(new SendVerificationEmailCommand(userId, 
+            await Mediator.Send(new SendVerificationEmailCommand(userId,
                 _httpContextAccessor.HttpContext?.Request.Scheme,
                 _httpContextAccessor.HttpContext?.Request.Host.Value));
+
+            return NoContent();
+        }
+        
+        // POST api/v1/identity/users/{userId}/verify-email
+        [HttpGet("{userId}/verify-email")]
+        [AllowAnonymous]
+        public async Task<ActionResult> VerifyEmailAsync([FromRoute] string userId, [FromQuery] string code)
+        {
+            await Mediator.Send(new VerifyEmailCommand(userId, code));
 
             return NoContent();
         }

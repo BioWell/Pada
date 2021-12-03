@@ -6,8 +6,10 @@ using Ardalis.GuardClauses;
 using MediatR;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Pada.Abstractions.Services.Mail;
 using Pada.Abstractions.Services.Sms;
+using Pada.Infrastructure.App;
 using Pada.Infrastructure.Utils;
 using Pada.Modules.Identity.Application.Users.Contracts;
 using Pada.Modules.Identity.Application.Users.Exceptions;
@@ -16,6 +18,7 @@ using Pada.Modules.Identity.Domain.Aggregates.Users;
 namespace Pada.Modules.Identity.Application.Users.Features.RegisterNewUser
 {
     public class RegisterNewUserCommandHandler : IRequestHandler<RegisterNewUserCommand>,
+        IRequestHandler<VerifyEmailCommand>,
         IRequestHandler<RegisterNewUserByPhoneCommand>,
         IRequestHandler<SendVerificationEmailCommand>
     {
@@ -25,13 +28,15 @@ namespace Pada.Modules.Identity.Application.Users.Features.RegisterNewUser
         private readonly RegistrationOptions _registrationOptions;
         private readonly ICustomMailService _mailService;
         private readonly IAppIdentityDbContext _identityDbContext;
+        private readonly AppOptions _appOptions;
 
         public RegisterNewUserCommandHandler(IUserRepository userRepository,
             ILogger<RegisterNewUserCommandHandler> logger,
             RegistrationOptions registrationOptions,
             ISmsSender smsSender,
             ICustomMailService mailService,
-            IAppIdentityDbContext identityDbContext)
+            IAppIdentityDbContext identityDbContext,
+            IOptions<AppOptions> appOptions)
         {
             _userRepository = userRepository;
             _logger = logger;
@@ -39,6 +44,7 @@ namespace Pada.Modules.Identity.Application.Users.Features.RegisterNewUser
             _smsSender = smsSender;
             _mailService = mailService;
             _identityDbContext = identityDbContext;
+            _appOptions = appOptions.Value;
         }
 
         public async Task<Unit> Handle(RegisterNewUserCommand command,
@@ -91,11 +97,6 @@ namespace Pada.Modules.Identity.Application.Users.Features.RegisterNewUser
             user.ChangePermissions(command.Permissions?.Select(x => AppPermission.Of(x, "")).ToArray(), false);
             user.ChangeRoles(command.Roles?.Select(x => Role.Of(x, x)).ToArray(), false);
 
-            // var result = await _userRepository.AddAsync(user);
-            // if (result.IsSuccess == false)
-            //     throw new RegisterNewUserFailedException(user.Name);
-            // _logger.LogInformation("Created an account for the user with ID: '{Id}'.", user.Id);
-
             await _identityDbContext.HandleTransactionAsync(beforeCommitHandler: async () =>
             {
                 var result = await _userRepository.AddAsync(user);
@@ -128,28 +129,11 @@ namespace Pada.Modules.Identity.Application.Users.Features.RegisterNewUser
             CancellationToken cancellationToken = default)
         {
             Guard.Against.Null(command, nameof(command));
-
-            var result = await _userRepository.GenerateEmailConfirmationTokenAsync(command.UserId);
-
-            if (result.IsSuccess == false)
-                throw new SendVerificationEmailFailedException(command.UserId);
-
-            var code = result.Token;
-
-            var encodedCode = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-            var callbackUrl =
-                $"{command.RequestScheme}://{command.RequestHost}/api/v1/identity/users/{command.UserId}/verify-email";
-            callbackUrl = QueryHelpers.AddQueryString(callbackUrl, "code", encodedCode);
-
-            string link = $"<a href='{callbackUrl}'>link</a>";
-            string content =
-                $"Welcome to online store application! Please verify your registration using this {link}.";
-
-            var user = await _userRepository.FindByIdAsync(command.UserId);
-
-            // Send Email
-            await _mailService.SendAsync(new CustomMailRequest(user.Email, "Verification Email", content));
-            _logger.LogInformation("Verification email sent successfully for userId:{UserId}", user.Id);
+            await EmailHelper.SendEmailVerification(command.UserId,
+                _userRepository,
+                _appOptions,
+                _mailService);
+            _logger.LogInformation("Verification email sent successfully for userId:{UserId}", command.UserId);
 
             //execute out of middleware transaction
             //this integration events will save in outbox before committing transaction and will execute in background after committing transaction
@@ -163,6 +147,30 @@ namespace Pada.Modules.Identity.Application.Users.Features.RegisterNewUser
             //     await _integrationEventDispatcher.DispatchAsync(
             //         new VerificationEmailSentIntegrationEvent(user.Id.Id, encodedCode, callbackUrl));
             // });
+
+            return Unit.Value;
+        }
+
+        public async Task<Unit> Handle(VerifyEmailCommand command, CancellationToken cancellationToken = default)
+        {
+            Guard.Against.Null(command, nameof(command));
+
+            var user = await _userRepository.FindByIdAsync(command.UserId);
+            if (user == null)
+            {
+                throw new UserNotFoundException();
+            }
+
+            var code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(command.Code));
+            var result = await _userRepository.ConfirmEmailAsync(user.Id.ToString(), code);
+
+            if (result.IsSuccess == false)
+                throw new VerificationTokenIsInvalidException(user.Id.ToString());
+
+            //this integration events will save in outbox after committing our TransactionalCommandMiddleware
+            // await _integrationEventDispatcher.DispatchAsync(new EmailVerifiedIntegrationEvent(user.Id.ToString()));
+
+            _logger.LogInformation("Email verified successfully for userId:{UserId}", user.Id);
 
             return Unit.Value;
         }
