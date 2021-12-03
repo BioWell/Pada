@@ -46,8 +46,4 @@
       <None Remove="Persistence\Mssql\Scripts\outbox.sql" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Messaging\Events" />
-    </ItemGroup>
-
 </Project>
