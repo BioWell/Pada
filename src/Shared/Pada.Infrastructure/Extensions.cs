@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using Pada.Abstractions.Modules;
 using Pada.Infrastructure.Caching;
 using Pada.Infrastructure.Exceptions;
+using Pada.Infrastructure.Hangfire;
 using Pada.Infrastructure.Logging;
 using Pada.Infrastructure.Services;
 using Pada.Infrastructure.Validations;
@@ -47,8 +48,8 @@ namespace Pada.Infrastructure
             // 3. WebApi 
             services.AddWebApi(configuration);
             services.AddEndpointsApiExplorer();
+            services.AddHangfireScheduler(configuration);
             services.AddCaching(configuration);
-            services.AddHangfireServer();
             services.AddServicesApplicationLayer(configuration);
             // services.AddSwaggerGen();
             
@@ -82,10 +83,7 @@ namespace Pada.Infrastructure
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-            app.UseHangfireDashboard("/jobs", new DashboardOptions
-            {
-                DashboardTitle = "Pada Jobs"
-            });
+
             foreach (var module in modules)
             {
                 app.Logger.LogInformation($"Configuring the middleware for: '{module.Name} module'...");
@@ -101,6 +99,8 @@ namespace Pada.Infrastructure
                     module.EndpointsConfigure(endpoints);
                 }
             });
+            
+            app.UseHangfireScheduler();
             
             return app;
         }

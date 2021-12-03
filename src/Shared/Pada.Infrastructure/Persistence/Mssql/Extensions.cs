@@ -29,8 +29,6 @@ namespace Pada.Infrastructure.Persistence.Mssql
                 .AddScoped<ISqlDbContext>(ctx => ctx.GetRequiredService<TContext>())
                 .AddScoped<IDbFacadeResolver>(ctx => ctx.GetRequiredService<TContext>());
 
-            services.AddHangfire(x => x.UseSqlServerStorage(connection));
-            
             return services;
         }
     }

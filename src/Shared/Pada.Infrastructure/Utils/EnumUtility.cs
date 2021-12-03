@@ -78,7 +78,7 @@ namespace Pada.Infrastructure.Utils
             return result;
         }
         
-        public static bool IsNullOrEmpty<T>(this IEnumerable<T> data)
+        public static bool EmumIsNullOrEmpty<T>(this IEnumerable<T> data)
         {
             return data == null || !data.Any();
         }

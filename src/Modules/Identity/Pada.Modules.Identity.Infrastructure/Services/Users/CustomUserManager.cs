@@ -306,7 +306,7 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
                 }
 
                 // add external logins
-                if (!user.Logins.IsNullOrEmpty())
+                if (!user.Logins.EmumIsNullOrEmpty())
                 {
                     foreach (var login in user.Logins)
                     {

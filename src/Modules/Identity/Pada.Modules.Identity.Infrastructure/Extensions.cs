@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Pada.Abstractions.Persistence.Mssql;
+using Pada.Infrastructure.Messaging.Outbox;
 using Pada.Infrastructure.Persistence.Mssql;
 using Pada.Infrastructure.Utils;
 using Pada.Modules.Identity.Application;
@@ -45,6 +46,8 @@ namespace Pada.Modules.Identity.Infrastructure
             services.AddMssqlPersistence<AppIdentityDbContext>(mssqlOptions.ConnectionString)
                 .AddScoped<IAppIdentityDbContext>(provider => provider.GetRequiredService<AppIdentityDbContext>());
 
+            services.AddEntityFrameworkOutbox<AppIdentityDbContext>(configuration);
+            
             services.TryAddTransient<IUserRepository, UserRepository>();
             
             //Identity dependencies override
