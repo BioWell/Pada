@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using FluentValidation.AspNetCore;
+using Hangfire;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -47,6 +48,7 @@ namespace Pada.Infrastructure
             services.AddWebApi(configuration);
             services.AddEndpointsApiExplorer();
             services.AddCaching(configuration);
+            services.AddHangfireServer();
             services.AddServicesApplicationLayer(configuration);
             // services.AddSwaggerGen();
             
@@ -80,6 +82,10 @@ namespace Pada.Infrastructure
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
+            app.UseHangfireDashboard("/jobs", new DashboardOptions
+            {
+                DashboardTitle = "Pada Jobs"
+            });
             foreach (var module in modules)
             {
                 app.Logger.LogInformation($"Configuring the middleware for: '{module.Name} module'...");

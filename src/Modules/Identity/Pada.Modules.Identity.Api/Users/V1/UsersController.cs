@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Pada.Infrastructure.Web;
 using Pada.Modules.Identity.Api.Users.Models.Requests;
@@ -18,13 +17,6 @@ namespace Pada.Modules.Identity.Api.Users.V1
     [ApiVersion("1.0")]
     public class UsersController : BaseController
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
-
-        public UsersController(IHttpContextAccessor httpContextAccessor)
-        {
-            _httpContextAccessor = httpContextAccessor;
-        }
-
         // POST api/v1/identity/users/Register
         [HttpPost("Register")]
         [AllowAnonymous]
@@ -122,9 +114,7 @@ namespace Pada.Modules.Identity.Api.Users.V1
         [Authorize(SecurityConstants.Permission.Security.VerifyEmail)]
         public async Task<ActionResult> SendVerificationEmailAsync([FromRoute] string userId)
         {
-            await Mediator.Send(new SendVerificationEmailCommand(userId,
-                _httpContextAccessor.HttpContext?.Request.Scheme,
-                _httpContextAccessor.HttpContext?.Request.Host.Value));
+            await Mediator.Send(new SendVerificationEmailCommand(userId));
 
             return NoContent();
         }

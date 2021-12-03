@@ -7,6 +7,7 @@ using MediatR;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Pada.Abstractions.Services.Hangfire;
 using Pada.Abstractions.Services.Mail;
 using Pada.Abstractions.Services.Sms;
 using Pada.Infrastructure.App;
@@ -29,6 +30,7 @@ namespace Pada.Modules.Identity.Application.Users.Features.RegisterNewUser
         private readonly ICustomMailService _mailService;
         private readonly IAppIdentityDbContext _identityDbContext;
         private readonly AppOptions _appOptions;
+        private readonly IJobService _jobService;
 
         public RegisterNewUserCommandHandler(IUserRepository userRepository,
             ILogger<RegisterNewUserCommandHandler> logger,
@@ -36,7 +38,8 @@ namespace Pada.Modules.Identity.Application.Users.Features.RegisterNewUser
             ISmsSender smsSender,
             ICustomMailService mailService,
             IAppIdentityDbContext identityDbContext,
-            IOptions<AppOptions> appOptions)
+            IOptions<AppOptions> appOptions, 
+            IJobService jobService)
         {
             _userRepository = userRepository;
             _logger = logger;
@@ -44,6 +47,7 @@ namespace Pada.Modules.Identity.Application.Users.Features.RegisterNewUser
             _smsSender = smsSender;
             _mailService = mailService;
             _identityDbContext = identityDbContext;
+            _jobService = jobService;
             _appOptions = appOptions.Value;
         }
 
@@ -132,7 +136,8 @@ namespace Pada.Modules.Identity.Application.Users.Features.RegisterNewUser
             await EmailHelper.SendEmailVerification(command.UserId,
                 _userRepository,
                 _appOptions,
-                _mailService);
+                _mailService,
+                _jobService);
             _logger.LogInformation("Verification email sent successfully for userId:{UserId}", command.UserId);
 
             //execute out of middleware transaction

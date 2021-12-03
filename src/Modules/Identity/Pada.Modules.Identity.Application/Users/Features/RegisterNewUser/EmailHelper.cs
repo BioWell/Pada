@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.WebUtilities;
+using Pada.Abstractions.Services.Hangfire;
 using Pada.Abstractions.Services.Mail;
 using Pada.Infrastructure.App;
 using Pada.Modules.Identity.Application.Users.Contracts;
@@ -13,7 +14,8 @@ namespace Pada.Modules.Identity.Application.Users.Features.RegisterNewUser
         public static async Task SendEmailVerification(string userId,
             IUserRepository userRepository,
             AppOptions appOptions,
-            ICustomMailService mailService)
+            ICustomMailService mailService,
+            IJobService jobService)
         {
             var result = await userRepository.GenerateEmailConfirmationTokenAsync(userId);
 
@@ -31,7 +33,8 @@ namespace Pada.Modules.Identity.Application.Users.Features.RegisterNewUser
                 $"Welcome to Pada online learning application! Please verify your registration using this {link}.";
 
             var user = await userRepository.FindByIdAsync(userId);
-            await mailService.SendAsync(new CustomMailRequest(user.Email, "Verification Email", content));
+            jobService.Enqueue(() => mailService.SendAsync(new CustomMailRequest(user.Email, "Verification Email", content)));
+            // await mailService.SendAsync(new CustomMailRequest(user.Email, "Verification Email", content));
         }
     }
 }
