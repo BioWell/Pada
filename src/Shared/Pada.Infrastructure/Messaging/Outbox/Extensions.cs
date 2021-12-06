@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Pada.Abstractions.Messaging;
 using Pada.Abstractions.Messaging.Outbox;
 using Pada.Abstractions.Persistence.Mssql;
 
@@ -26,6 +27,7 @@ namespace Pada.Infrastructure.Messaging.Outbox
             if (outboxOptions.Enabled)
                 services.AddHostedService<OutboxProcessorBackgroundService>();
 
+            services.AddSingleton<INotificationEventDispatcher, NotificationEventDispatcher>();
             return services;
         }
     }
