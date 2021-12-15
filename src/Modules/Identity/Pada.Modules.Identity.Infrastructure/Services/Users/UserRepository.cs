@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
+﻿using System.Security.Claims;
 using AutoMapper;
 using EasyCaching.Core;
 using Microsoft.AspNetCore.Identity;
@@ -13,6 +9,7 @@ using Pada.Infrastructure.Caching;
 using Pada.Modules.Identity.Application.Users.Contracts;
 using Pada.Modules.Identity.Application.Users.Dtos;
 using Pada.Modules.Identity.Domain.Aggregates.Users;
+using Pada.Modules.Identity.Infrastructure.Aggregates.Users;
 using Pada.Modules.Identity.Infrastructure.Persistence;
 
 namespace Pada.Modules.Identity.Infrastructure.Services.Users
@@ -73,7 +70,8 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
 
         public async Task<User> FindByNameOrEmailAsync(string userNameOrEmail, bool invalidateCache = false)
         {
-            if (invalidateCache) await InvalidateCache(CacheKey.With(nameof(FindByNameOrEmailAsync), userNameOrEmail));
+            if (invalidateCache)
+                await InvalidateCache(CacheKey.With(nameof(FindByNameOrEmailAsync), userNameOrEmail));
 
             var appUser = await _userManager.FindByNameAsync(userNameOrEmail) ??
                           await _userManager.FindByEmailAsync(userNameOrEmail);
@@ -172,6 +170,9 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
             else
                 identityResult = await _userManager.CreateAsync(appUser, user.Password);
 
+            if (identityResult.Succeeded)
+                await InvalidateUserCache(appUser);
+            
             return new CreateUserResponse(Guid.Parse(appUser.Id),
                 identityResult.Succeeded,
                 identityResult.Errors
@@ -187,8 +188,8 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
             var appUser = user.ToApplicationUser();
             IdentityResult identityResult = await _userManager.UpdateAsync(appUser);
 
-            // if (identityResult.Succeeded)
-            //     await InvalidateUserCache(appUser);
+            if (identityResult.Succeeded)
+                await InvalidateUserCache(appUser);
 
             return new UpdateUserResponse(appUser.ToUserId(),
                 identityResult.Succeeded,
@@ -211,6 +212,9 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
 
             var identityResult = await _userManager.SetLockoutEndDateAsync(appUser,
                 DateTimeOffset.Now + duration);
+            
+            if (identityResult.Succeeded)
+                await InvalidateUserCache(appUser);
 
             return new LockUserResponse(appUser.ToUserId(),
                 identityResult.Succeeded,
@@ -222,6 +226,14 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
         private async Task InvalidateCache(string key)
         {
             await _cachingProvider.RemoveAsync(key);
+        }
+        
+        private async Task InvalidateUserCache(AppUser user)
+        {
+            await InvalidateCache(CacheKey.With(nameof(FindByIdAsync), user.Id));
+            await InvalidateCache(CacheKey.With(nameof(FindByEmailAsync), user.Email));
+            await InvalidateCache(CacheKey.With(nameof(FindByNameAsync), user.UserName));
+            await InvalidateCache(CacheKey.With(nameof(FindByPhoneAsync), user.PhoneNumber));
         }
     }
 }

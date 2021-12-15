@@ -42,6 +42,16 @@ namespace Pada.Modules.Identity.Api.Users.V1
             var name = nameof(FindByPhoneAsync);
             return CreatedAtRoute(name, new {id = command.Phone}, command);
         }
+        
+        // GET api/v1/identity/users/roles
+        // [HttpGet("id/{id}", Name = nameof(GetUserByIdAsync))]
+        // [AllowAnonymous]
+        // public async Task<ActionResult<UserDto>> GetUserByIdAsync([FromRoute] Guid id)
+        // {
+        //     var result = await Mediator.Send(new GetUserByIdQuery(id));
+        //
+        //     return Ok(result);
+        // }
 
         // GET api/v1/identity/users/id/{userId}
         [HttpGet("id/{id}", Name = nameof(GetUserByIdAsync))]

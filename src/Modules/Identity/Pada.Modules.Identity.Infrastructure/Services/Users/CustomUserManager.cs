@@ -171,12 +171,6 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
 
             var result = await base.UpdateUserAsync(existentUser);
             
-            // if (result == IdentityResult.Success)
-            // {
-            //     var cacheKey = CacheKey.With(GetType(), nameof(FindByIdAsync), user.Id);
-            //     await _cachingProvider.RemoveAsync(cacheKey);
-            // }
-
             return result;
         }
 
@@ -233,14 +227,14 @@ namespace Pada.Modules.Identity.Infrastructure.Services.Users
                 var sourceLogins = userLogins;
                 //Add
                 foreach (var item in sourceLogins.Where(x =>
-                    targetLogins.All(y => x.LoginProvider + x.ProviderKey != y.LoginProvider + y.ProviderKey)))
+                             targetLogins.All(y => x.LoginProvider + x.ProviderKey != y.LoginProvider + y.ProviderKey)))
                 {
                     await AddLoginAsync(existentUser, item);
                 }
 
                 //Remove
                 foreach (var item in targetLogins.Where(x =>
-                    sourceLogins.All(y => x.LoginProvider + x.ProviderKey != y.LoginProvider + y.ProviderKey)))
+                             sourceLogins.All(y => x.LoginProvider + x.ProviderKey != y.LoginProvider + y.ProviderKey)))
                 {
                     await RemoveLoginAsync(existentUser, item.LoginProvider, item.ProviderKey);
                 }

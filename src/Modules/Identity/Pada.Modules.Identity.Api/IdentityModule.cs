@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Pada.Abstractions.Auth;
 using Pada.Abstractions.Modules;
 using Pada.Infrastructure.Auth;
+using Pada.Infrastructure.Web.Extensions;
 using Pada.Modules.Identity.Application;
 using Pada.Modules.Identity.Domain.Aggregates.Users;
 using Pada.Modules.Identity.Infrastructure;
@@ -31,8 +32,8 @@ namespace Pada.Modules.Identity.Api
         public void Register(IServiceCollection services)
         {
             services.AddIdentityInfrastructure(Configuration, Name);
-            services.AddCustomJwtAuthentication(Configuration, 
-                GetClaimPolicies(), 
+            services.AddCustomJwtAuthentication(Configuration,
+                GetClaimPolicies(),
                 GetRolePolicies(),
                 TokenStorageType.InMemory,
                 nameof(JwtOptions));
@@ -46,9 +47,15 @@ namespace Pada.Modules.Identity.Api
         public void EndpointsConfigure(IEndpointRouteBuilder endpoints)
         {
             endpoints.MapGet(Path, ctx => ctx.Response.WriteAsync($"{Name} module"));
+            endpoints.MapGet($"{Path}/protected",
+                    ctx => ctx.Response.WriteAsync($"{Name} module, protected end-point works."))
+                .ApplyPoliciesAuthorization(new List<string>()
+                {
+                    AppPermission.Users.Create.Name
+                });
             endpoints.MapGet($"{Path}/ping", ctx => ctx.Response.WriteAsJsonAsync(true));
         }
-        
+
         private IList<ClaimPolicy> GetClaimPolicies()
         {
             return AppPermission.GetAllPermissions().Select(x => new ClaimPolicy
@@ -60,13 +67,13 @@ namespace Pada.Modules.Identity.Api
                 }
             }).ToList();
         }
-        
+
         private IList<RolePolicy> GetRolePolicies()
         {
             return Role.AllRoles().Select(x => new RolePolicy()
             {
                 Name = x.Name,
-                Roles = new List<string> { x.Name }
+                Roles = new List<string> {x.Name}
             }).ToList();
         }
     }
