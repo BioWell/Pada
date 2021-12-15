@@ -25,7 +25,7 @@ namespace Pada.Infrastructure.Domain
         protected AggregateRoot(TId id) : base(id)
         {
         }
-        
+
         protected void AddDomainEvent(IDomainEvent @event)
         {
             if (!_events.Any() && !_versionIncremented)

@@ -15,6 +15,7 @@ using Pada.Infrastructure.Utils;
 using Pada.Modules.Identity.Application.Users.Contracts;
 using Pada.Modules.Identity.Application.Users.Exceptions;
 using Pada.Modules.Identity.Domain.Aggregates.Users;
+using Pada.Modules.Identity.Domain.Aggregates.Users.DomainEvents;
 
 namespace Pada.Modules.Identity.Application.Users.Features.RegisterNewUser
 {
@@ -97,6 +98,8 @@ namespace Pada.Modules.Identity.Application.Users.Features.RegisterNewUser
                 command.EmailConfirmed,
                 command.PhotoUrl,
                 command.Status);
+            
+            // user.AddDomainEvent(new NewUserRegisteredDomainEvent(user));
 
             user.ChangePermissions(command.Permissions?.Select(x => AppPermission.Of(x, "")).ToArray(), false);
             user.ChangeRoles(command.Roles?.Select(x => Role.Of(x, x)).ToArray(), false);

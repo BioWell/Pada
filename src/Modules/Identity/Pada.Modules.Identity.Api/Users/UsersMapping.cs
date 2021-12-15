@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using Pada.Modules.Identity.Api.Users.Models.Requests;
+using Pada.Modules.Identity.Application.Users.Features.PersonalInformation;
 using Pada.Modules.Identity.Application.Users.Features.RegisterNewUser;
 
 namespace Pada.Modules.Identity.Api.Users
@@ -23,6 +24,10 @@ namespace Pada.Modules.Identity.Api.Users
                 .ForMember(d => d.PhoneNumber, 
                     opt => opt.MapFrom(s => s.Phone))
                 .ConstructUsing(req => new RegisterNewUserByPhoneCommand(req.Phone));
+            
+            CreateMap<ChangePersonalInfoRequest, ChangePersonalInformationCommand>().ConstructUsing(req => new
+                ChangePersonalInformationCommand(req.Id ?? Guid.NewGuid(), req.FirstName, req.LastName,
+                    req.Name, req.PhoneNumber, req.PhotoUrl, req.Email));
         }
     }
 }

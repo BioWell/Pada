@@ -108,9 +108,12 @@ namespace Pada.Modules.Identity.Domain.Aggregates.Users
             user.SetUserName(userName);
             user.SetStatus(status);
             user.SetUserType(userType);
-            user.AddDomainEvent(new NewUserRegisteredDomainEvent(user));
+            if (createdDate is null) 
+                user.AddDomainEvent(new NewUserRegisteredDomainEvent(user));
             return user;
         }
+        
+        
 
         public void ChangeStatus(string status)
         {

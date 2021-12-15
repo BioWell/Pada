@@ -8,6 +8,7 @@ using Pada.Modules.Identity.Application.Users.Dtos;
 using Pada.Modules.Identity.Application.Users.Features.Activation;
 using Pada.Modules.Identity.Application.Users.Features.GetUser;
 using Pada.Modules.Identity.Application.Users.Features.Lock;
+using Pada.Modules.Identity.Application.Users.Features.PersonalInformation;
 using Pada.Modules.Identity.Application.Users.Features.RegisterNewUser;
 using Pada.Modules.Identity.Domain;
 
@@ -126,6 +127,17 @@ namespace Pada.Modules.Identity.Api.Users.V1
         {
             await Mediator.Send(new VerifyEmailCommand(userId, code));
 
+            return NoContent();
+        }
+        
+        // PUT api/v1/identity/users/update-personal-info
+        [HttpPut("update-personal-info")]
+        // [AllowAnonymous]
+        [Authorize(SecurityConstants.Permission.Users.Edit)]
+        public async Task<ActionResult> UpdatePersonalInformation([FromBody] ChangePersonalInfoRequest userInfoRequest)
+        {
+            var command = Mapper.Map<ChangePersonalInformationCommand>(userInfoRequest);
+            await Mediator.Send(command);
             return NoContent();
         }
     }
